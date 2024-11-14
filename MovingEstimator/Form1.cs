@@ -62,8 +62,12 @@ namespace MovingEstimator
                     string[] arr;
                     while (n_Line < s_Lines.Length)
                     {
-                        arr = Move_description.Text.Split(new string[] { "\n" }, StringSplitOptions.None);
-                        if (arr.Length < 2) throw new Exception("Invalid format");
+                        arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
+                        if (arr.Length < 2)
+                        {
+                            ++n_Line;
+                            continue;
+                        }
 
                         key = arr[0].Trim();
                         value = arr[1].Trim();
@@ -952,8 +956,12 @@ namespace MovingEstimator
                     string[] arr;
                     while (n_Line < s_Lines.Length)
                     {
-                        arr = Move_description.Text.Split(new string[] { "\n" }, StringSplitOptions.None);
-                        if (arr.Length < 2) throw new Exception("Invalid format");
+                        arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
+                        if (arr.Length < 2)
+                        {
+                            ++n_Line;
+                            continue;
+                        }
 
                         key = arr[0].Trim();
                         value = arr[1].Trim();
