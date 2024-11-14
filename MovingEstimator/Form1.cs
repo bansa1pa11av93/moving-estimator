@@ -782,56 +782,6 @@ namespace MovingEstimator
             s_moving_date3 = monthCalendar3.SelectionStart.ToShortDateString();
         }
 
-        private string jour_de_semaine(DayOfWeek j)
-        {
-            switch (j)
-            {
-                case DayOfWeek.Sunday: return "Dimanche ";
-                case DayOfWeek.Monday: return "Lundi ";
-                case DayOfWeek.Tuesday: return "Mardi ";
-                case DayOfWeek.Wednesday: return "Mercredi ";
-                case DayOfWeek.Thursday: return "Jeudi ";
-                case DayOfWeek.Friday: return "Vendredi ";
-                case DayOfWeek.Saturday: return "Samedi ";
-            }
-            return " ";
-        }
-        private string Day_of_week(DayOfWeek d)
-        {
-            switch (d)
-            {
-                case DayOfWeek.Sunday: return "Sunday ";
-                case DayOfWeek.Monday: return "Monday ";
-                case DayOfWeek.Tuesday: return "Tuesday ";
-                case DayOfWeek.Wednesday: return "Wednesday ";
-                case DayOfWeek.Thursday: return "Thursday ";
-                case DayOfWeek.Friday: return "Friday ";
-                case DayOfWeek.Saturday: return "Saturday ";
-            }
-            return " ";
-        }
-        private double minimum_billed(double h)
-        {
-            if (h < 2) return 2;
-            if (h < 3) return 3;
-            double rounded_Minimum = h * .75;
-            if (h * .75 < 3) return 3;
-            return quarter_round(h * .75);
-        }
-        private double quarter_round(double q)
-        {
-            double nearestInt = Math.Truncate(q);
-            double fractionalPart = q - nearestInt;
-
-            if (fractionalPart < 0.125) return nearestInt;
-            if (fractionalPart < 0.375) return nearestInt + 0.25;
-            if (fractionalPart < 0.625) return nearestInt + 0.5;
-            if (fractionalPart < 0.875) return nearestInt + 0.75;
-
-            return nearestInt + 1.0;
-        }
-
-
         private void checkBox_2men_CheckedChanged(object sender, EventArgs e)
         {
             // uncheck other options
@@ -879,7 +829,7 @@ namespace MovingEstimator
             RTXTbox_Contrat.Text = "=🚚🏃🏘== 48H SPECIAL OFFER =🥇= ";
             RTXTbox_Contrat.Text += "\nMoving with X ";
             RTXTbox_Contrat.Text += "\nHello, " + s_client_name + " " + s_client_phn_number + " ";
-            s_moving_date = Day_of_week(monthCalendar1.SelectionStart.DayOfWeek);
+            s_moving_date = Helper.Day_of_week(monthCalendar1.SelectionStart.DayOfWeek);
             s_moving_date += monthCalendar1.SelectionStart.ToShortDateString();
             s_moving_date += " " + textBox1_time.Text;
             if (checkBox1_lastavailability.Checked)
@@ -908,7 +858,7 @@ namespace MovingEstimator
             RTXTbox_Contrat.Text += "                 - " + s_moving_date;
             if (textBox2_time.Text != "")
             {
-                s_moving_date2 = Day_of_week(monthCalendar2.SelectionStart.DayOfWeek);
+                s_moving_date2 = Helper.Day_of_week(monthCalendar2.SelectionStart.DayOfWeek);
                 s_moving_date2 += monthCalendar2.SelectionStart.ToShortDateString();
                 s_moving_date2 += " " + textBox2_time.Text;
                 if (checkBox2_lastavailability.Checked)
@@ -917,7 +867,7 @@ namespace MovingEstimator
             }
             if (textBox3_time.Text != "")
             {
-                s_moving_date3 = Day_of_week(monthCalendar3.SelectionStart.DayOfWeek);
+                s_moving_date3 = Helper.Day_of_week(monthCalendar3.SelectionStart.DayOfWeek);
                 s_moving_date3 += monthCalendar3.SelectionStart.ToShortDateString();
                 s_moving_date3 += " " + textBox3_time.Text;
                 if (checkBox3_lastavailability.Checked)
@@ -983,10 +933,10 @@ namespace MovingEstimator
             dheures += Convert.ToDouble(textBox_UnloadingTimeContract.Text);
             RTXTbox_Contrat.Text += "\n     + " + textBox_UnloadingTimeContract.Text + "h unloading + invoicing + payment.";
 
-            dheures = quarter_round(dheures);
+            dheures = Helper.QuarterRound(dheures);
             textBox_HourlyRate.Text = textBox_HourlyRate.Text.Replace('.', ',');
             dHourly_rate = Math.Round((Double)Convert.ToDouble(textBox_HourlyRate.Text), 2);
-            RTXTbox_Contrat.Text += "\n     Total estimated hours " + dheures + "h x $" + dHourly_rate + "/h ( minimum " + minimum_billed(dheures) + "h):";
+            RTXTbox_Contrat.Text += "\n     Total estimated hours " + dheures + "h x $" + dHourly_rate + "/h ( minimum " + Helper.MinimumBilled(dheures) + "h):";
 
             dMoving_estimated_cost = 0;
             dMoving_estimated_cost += dheures * dHourly_rate;
@@ -1065,7 +1015,7 @@ namespace MovingEstimator
             RTXTbox_Contrat.Text += "\nDéménagement par X ";
             RTXTbox_Contrat.Text += "\nBonjour " + s_client_name + " " + s_client_phn_number + ", ";
 
-            s_moving_date = jour_de_semaine(monthCalendar1.SelectionStart.DayOfWeek);
+            s_moving_date = Helper.JourDeSemaine(monthCalendar1.SelectionStart.DayOfWeek);
             s_moving_date += monthCalendar1.SelectionStart.ToShortDateString();
             s_moving_date += "        " + textBox1_time.Text;
             if (checkBox1_lastavailability.Checked)
@@ -1080,7 +1030,7 @@ namespace MovingEstimator
 
             if (textBox2_time.Text != "")
             {
-                s_moving_date2 = jour_de_semaine(monthCalendar2.SelectionStart.DayOfWeek);
+                s_moving_date2 = Helper.JourDeSemaine(monthCalendar2.SelectionStart.DayOfWeek);
                 s_moving_date2 += monthCalendar2.SelectionStart.ToShortDateString();
                 s_moving_date2 += "        " + textBox2_time.Text;
                 if (checkBox2_lastavailability.Checked)
@@ -1091,7 +1041,7 @@ namespace MovingEstimator
             }
             if (textBox3_time.Text != "")
             {
-                s_moving_date3 = jour_de_semaine(monthCalendar3.SelectionStart.DayOfWeek);
+                s_moving_date3 = Helper.JourDeSemaine(monthCalendar3.SelectionStart.DayOfWeek);
                 s_moving_date3 += monthCalendar3.SelectionStart.ToShortDateString();
                 s_moving_date3 += "        " + textBox3_time.Text;
                 if (checkBox3_lastavailability.Checked)
@@ -1171,13 +1121,13 @@ namespace MovingEstimator
             dheures += Convert.ToDouble(textBox_UnloadingTimeContract.Text);
             RTXTbox_Contrat.Text += "\n     + " + textBox_UnloadingTimeContract.Text + "h déchargement + facturation + paiement.";
 
-            dheures = quarter_round(dheures);
+            dheures = Helper.QuarterRound(dheures);
             RTXTbox_Contrat.Text += "\n     Total heures estimées " + dheures;
             dMoving_estimated_cost = 0;
 
             dMoving_estimated_cost += dheures * dHourly_rate;
             textBox_HourlyRate.Text = textBox_HourlyRate.Text.Replace('.', ',');
-            RTXTbox_Contrat.Text += "h x " + dHourly_rate + "$/h ( minimum " + minimum_billed(dheures) + "h):";
+            RTXTbox_Contrat.Text += "h x " + dHourly_rate + "$/h ( minimum " + Helper.MinimumBilled(dheures) + "h):";
 
             RTXTbox_Contrat.Text += "\nAucun frais caché!!! :)";
             //if plastic bags needed
