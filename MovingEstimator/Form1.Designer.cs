@@ -105,7 +105,7 @@ namespace MovingEstimator
             this.Analyse_move.TabIndex = 2;
             this.Analyse_move.Text = "Analyse!";
             this.Analyse_move.UseVisualStyleBackColor = true;
-            //this.Analyse_move.Click += new System.EventHandler(this.button1_Click);
+            this.Analyse_move.Click += new System.EventHandler(this.button1_Click);
             // 
             // RTXTbox_Contrat
             // 
@@ -121,21 +121,21 @@ namespace MovingEstimator
             this.monthCalendar1.Location = new System.Drawing.Point(330, 0);
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 5;
-            //this.monthCalendar1.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar1_DateChanged);
+            this.monthCalendar1.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar1_DateChanged);
             // 
             // monthCalendar2
             // 
             this.monthCalendar2.Location = new System.Drawing.Point(598, 0);
             this.monthCalendar2.Name = "monthCalendar2";
             this.monthCalendar2.TabIndex = 6;
-            //this.monthCalendar2.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar2_DateChanged);
+            this.monthCalendar2.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar2_DateChanged);
             // 
             // monthCalendar3
             // 
             this.monthCalendar3.Location = new System.Drawing.Point(863, 0);
             this.monthCalendar3.Name = "monthCalendar3";
             this.monthCalendar3.TabIndex = 7;
-            //this.monthCalendar3.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar3_DateChanged);
+            this.monthCalendar3.DateChanged += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar3_DateChanged);
             // 
             // lbl_Time1
             // 
@@ -231,7 +231,7 @@ namespace MovingEstimator
             this.button_contract_eng.TabIndex = 22;
             this.button_contract_eng.Text = "Contract Eng";
             this.button_contract_eng.UseVisualStyleBackColor = true;
-            //this.button_contract_eng.Click += new System.EventHandler(this.button_contract_eng_Click);
+            this.button_contract_eng.Click += new System.EventHandler(this.button_contract_eng_Click);
             // 
             // button_contract_fr
             // 
@@ -239,9 +239,9 @@ namespace MovingEstimator
             this.button_contract_fr.Name = "button_contract_fr";
             this.button_contract_fr.Size = new System.Drawing.Size(116, 28);
             this.button_contract_fr.TabIndex = 23;
-            //this.button_contract_fr.Text = "Contrat FR";
+            this.button_contract_fr.Text = "Contrat FR";
             this.button_contract_fr.UseVisualStyleBackColor = true;
-            //this.button_contract_fr.Click += new System.EventHandler(this.button_contract_fr_Click);
+            this.button_contract_fr.Click += new System.EventHandler(this.button_contract_fr_Click);
             // 
             // textBox_loadingTimeContract
             // 
@@ -405,7 +405,7 @@ namespace MovingEstimator
             this.checkBox_2men.Size = new System.Drawing.Size(18, 17);
             this.checkBox_2men.TabIndex = 41;
             this.checkBox_2men.UseVisualStyleBackColor = true;
-            //this.checkBox_2men.CheckedChanged += new System.EventHandler(this.checkBox_2men_CheckedChanged);
+            this.checkBox_2men.CheckedChanged += new System.EventHandler(this.checkBox_2men_CheckedChanged);
             // 
             // checkBox_3men
             // 
@@ -415,7 +415,7 @@ namespace MovingEstimator
             this.checkBox_3men.Size = new System.Drawing.Size(18, 17);
             this.checkBox_3men.TabIndex = 42;
             this.checkBox_3men.UseVisualStyleBackColor = true;
-            //this.checkBox_3men.CheckedChanged += new System.EventHandler(this.checkBox_3men_CheckedChanged);
+            this.checkBox_3men.CheckedChanged += new System.EventHandler(this.checkBox_3men_CheckedChanged);
             // 
             // checkBox_4men
             // 
@@ -425,7 +425,7 @@ namespace MovingEstimator
             this.checkBox_4men.Size = new System.Drawing.Size(18, 17);
             this.checkBox_4men.TabIndex = 43;
             this.checkBox_4men.UseVisualStyleBackColor = true;
-            //this.checkBox_4men.CheckedChanged += new System.EventHandler(this.checkBox_4men_CheckedChanged);
+            this.checkBox_4men.CheckedChanged += new System.EventHandler(this.checkBox_4men_CheckedChanged);
             // 
             // textBox_HourlyRate
             // 
@@ -517,7 +517,7 @@ namespace MovingEstimator
             this.button_reset.TabIndex = 54;
             this.button_reset.Text = "Reset!";
             this.button_reset.UseVisualStyleBackColor = true;
-            //this.button_reset.Click += new System.EventHandler(this.button_reset_Click);
+            this.button_reset.Click += new System.EventHandler(this.button_reset_Click);
             // 
             // textBox_Starting_address
             // 
