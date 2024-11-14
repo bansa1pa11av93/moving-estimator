@@ -785,10 +785,8 @@ namespace MovingEstimator
         private void checkBox_2men_CheckedChanged(object sender, EventArgs e)
         {
             // uncheck other options
-            if (checkBox_3men.CheckState == CheckState.Checked)
-                checkBox_3men.CheckState = CheckState.Unchecked;
-            if (checkBox_4men.CheckState == CheckState.Checked)
-                checkBox_4men.CheckState = CheckState.Unchecked;
+            checkBox_3men.Checked = !checkBox_3men.Checked;
+            checkBox_4men.Checked = !checkBox_4men.Checked;
 
             textBox_loadingTimeContract.Text = label_2men_loading_time.Text;
             textBox_UnloadingTimeContract.Text = label_2men_unloading_time.Text;
@@ -800,10 +798,8 @@ namespace MovingEstimator
         private void checkBox_3men_CheckedChanged(object sender, EventArgs e)
         {
             // uncheck other options
-            if (checkBox_2men.CheckState == CheckState.Checked)
-                checkBox_2men.CheckState = CheckState.Unchecked;
-            if (checkBox_4men.CheckState == CheckState.Checked)
-                checkBox_4men.CheckState = CheckState.Unchecked;
+            checkBox_2men.Checked = !checkBox_2men.Checked;
+            checkBox_4men.Checked = !checkBox_4men.Checked;
 
             textBox_loadingTimeContract.Text = label_3men_loading_time.Text;
             textBox_UnloadingTimeContract.Text = label_3men_unloading_time.Text;
@@ -813,10 +809,8 @@ namespace MovingEstimator
         private void checkBox_4men_CheckedChanged(object sender, EventArgs e)
         {
             // uncheck other options
-            if (checkBox_3men.CheckState == CheckState.Checked)
-                checkBox_3men.CheckState = CheckState.Unchecked;
-            if (checkBox_2men.CheckState == CheckState.Checked)
-                checkBox_2men.CheckState = CheckState.Unchecked;
+            checkBox_3men.Checked = !checkBox_3men.Checked;
+            checkBox_2men.Checked = !checkBox_2men.Checked;
 
             textBox_loadingTimeContract.Text = label_4men_loading_time.Text;
             textBox_UnloadingTimeContract.Text = label_4men_unloading_time.Text;
