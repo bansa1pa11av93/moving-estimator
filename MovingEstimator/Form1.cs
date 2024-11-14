@@ -149,8 +149,7 @@ namespace MovingEstimator
                         if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
                         {
                             //REFRIGERATOR	1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
+                            n_items = int.Parse(value);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
@@ -163,8 +162,7 @@ namespace MovingEstimator
                         if (key.Contains(language.Large()))
                         {
                             //LARGE REFRIGERATOR	1 
-                            s_Lines[n_Line] = value;// delete "LARGE REFRIGERATOR"
-                            n_items = int.Parse(s_Lines[n_Line]);
+                            n_items = int.Parse(value);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items; // number of LARGE REFRIGERATOR
@@ -177,8 +175,7 @@ namespace MovingEstimator
                         if (key.Contains(language.Small()))
                         {
                             //SMALL REFRIGERATOR	1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
+                            n_items = int.Parse(value);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
@@ -192,8 +189,7 @@ namespace MovingEstimator
                     if (key.Contains(language.LargeFreezer()))
                     {
                         //LARGE FREEZER   1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -207,8 +203,7 @@ namespace MovingEstimator
                     if (key.Contains(language.MediumFreezer()))
                     {
                         //MEDIUM FREEZER   1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -222,8 +217,7 @@ namespace MovingEstimator
                     if (key.Contains(language.CookersOvenStove()))
                     {
                         //COOKERS - OVEN / STOVE    1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -237,8 +231,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Dishwasher()))
                     {
                         //DISHWASHER    1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -252,8 +245,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
                     {
                         //DRYER    1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -267,8 +259,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
                     {
                         //WASHER    1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -287,8 +278,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.KingBedBase()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -301,8 +291,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.QueenBedBase()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -315,8 +304,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.DoubleBedBase()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -329,8 +317,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.SingleBedBase()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -343,8 +330,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.KingMattress()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += 2 * n_items;
                         if (n_items > 0)
                         {
@@ -359,8 +345,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.QueenMattress()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -375,8 +360,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.DoubleMattress()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -392,8 +376,7 @@ namespace MovingEstimator
                     if (key.Contains(language.SingleMattressSmall()))
                     {
                         //SINGLE MATTRESS (SMALL)
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -407,8 +390,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.BoxspringKing()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -421,8 +403,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.BoxspringSingle()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -435,8 +416,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.BoxspringQueen()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -449,8 +429,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.BoxspringDouble()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         nPlastic_bags += n_items;
                         if (n_items > 0)
                         {
@@ -463,8 +442,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Commode()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -477,8 +455,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Nightstand()))
                     {
                         //TABLE DE CHEVET 1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -492,8 +469,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Wardrobe2Doors()))
                     {
                         //ARMOIRE(2 PORTES)  1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -506,8 +482,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Wardrobe1Door()))
                     {
                         //WARDROBE (1 DOOR)  1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -520,8 +495,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Cradle()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -533,8 +507,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Loveseat2SeaterSofa()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -547,8 +520,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Sofa3Seater()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -560,8 +532,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Armchair()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -576,8 +547,7 @@ namespace MovingEstimator
                     {
                         if (key.Contains(language.Large()))
                         {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
+                            n_items = int.Parse(value);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
@@ -589,8 +559,7 @@ namespace MovingEstimator
                         }
                         if (key.Contains(language.MediumSmall()))
                         {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
+                            n_items = int.Parse(value);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
@@ -604,8 +573,7 @@ namespace MovingEstimator
 
                     if (key.Contains(language.LargeTv()))
                     {// TÉLÉVISEUR(GRAND) 2
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -617,8 +585,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.MediumSmallTv()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -631,8 +598,7 @@ namespace MovingEstimator
 
                     if (key.Contains(language.CoffeeAndSideTables()))
                     {//COFFEE AND SIDE TABLES  1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -644,8 +610,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.DiningOrPatioTables()))
                     {//DINING OR PATIO TABLES  1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -658,8 +623,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Chairs()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -671,8 +635,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Library()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -685,8 +648,7 @@ namespace MovingEstimator
                     if (key.Contains(language.DrawerFolderCabinet()))
                     {
                         //DRAWER FOLDER CABINET 1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -699,8 +661,7 @@ namespace MovingEstimator
                     if (key.Contains(language.DessertHucheCabinets()))
                     {
                         //DESSERT, HUCHE, CABINETS  1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -713,8 +674,7 @@ namespace MovingEstimator
                     if (key.Contains(language.MirrorsFrames()))
                     {
                         //MIRRORS - FRAMES    2
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -727,8 +687,7 @@ namespace MovingEstimator
                     if (key.Contains(language.LargeCarpet()))
                     {
                         //LARGE CARPET 1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -741,8 +700,7 @@ namespace MovingEstimator
                     if (key.Contains(language.SmallMediumCarpet()))
                     {
                         //LARGE CARPET 1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -755,8 +713,7 @@ namespace MovingEstimator
                     if (key.Contains(language.LampsAndLampShades()))
                     {
                         //LAMPE 1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -818,8 +775,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Barbecue()))
                     {
                         //BARBECUE	2
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -832,8 +788,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
                     {
                         //VÉLO	1
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -846,8 +801,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Suitcases()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -861,8 +815,7 @@ namespace MovingEstimator
                     if (key.Contains(language.Tires()))
                     {
                         //PNEUS   13
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -875,8 +828,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.Treadmill()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -888,8 +840,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.StationaryBikes()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -901,8 +852,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.PoolTable()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += "\n---- " + n_items + " x " + language.PoolTable() + "; ----\n";
@@ -914,8 +864,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.YourBoxesApproximate()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -927,8 +876,7 @@ namespace MovingEstimator
                     }
                     if (key.Contains(language.WardrobeBoxes4Provided()))
                     {
-                        s_Lines[n_Line] = value;
-                        n_items = int.Parse(s_Lines[n_Line]);
+                        n_items = int.Parse(value);
                         if (n_items > 0)
                         {
                             s_inventory += n_items;
@@ -943,13 +891,12 @@ namespace MovingEstimator
                     if (key.Contains(language.MoreDetails()))
                     {
                         //PLUS DE PRÉCISIONS rien pour l\'instant
-                        s_Lines[n_Line] = value;
                         s_notes += "\n" + language.MoreDetails() + ": ";
-                        s_notes += s_Lines[n_Line];
+                        s_notes += value;
                     }
                     if (key.Contains(language.HowDidYouHearAboutUs()))
                     {
-                        s_notes += '\n' + s_Lines[n_Line];
+                        s_notes += '\n' + value;
                         textBox_Destination_source.Text = value;
                     }
 
