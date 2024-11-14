@@ -52,14 +52,16 @@ namespace MovingEstimator
             reset();            // intializing elements
             if (Move_description.Text.Length > 2)
             {
-                ILanguage language = new English();
+                const string GEnglishToDetect = "STEP 1 - CUSTOMER INFORMATION";
+                const string GFrenchToDetect = "ÉTAPE 1 - INFORMATIONS CLIENT";
+                ILanguage language = null;
 
                 // divides text into lines
                 string[] s_Lines = Move_description.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
                 int n_Line = 0;
                 // french or english  form ?
                 //French form
-                if (Move_description.Text.Contains("ÉTAPE 1 - INFORMATIONS CLIENT"))
+                if (Move_description.Text.Contains(GFrenchToDetect))
                 {
                     string key, value;
                     string[] arr;
@@ -953,8 +955,10 @@ namespace MovingEstimator
                     }
                 }// french form
                 // English form
-                if (Move_description.Text.Contains(language.Step1()))
+                if (Move_description.Text.Contains(GEnglishToDetect))
                 {
+                    language = new English();
+
                     string key, value;
                     string[] arr;
                     while (n_Line < s_Lines.Length)
@@ -984,7 +988,7 @@ namespace MovingEstimator
                             s_client_name = title_and_name;
 
                         }
-                        if (key.Contains(language.Title()))
+                        if (key.Contains(language.Email()))
                         {
                             //delete E-MAIL
                             s_client_email = value;

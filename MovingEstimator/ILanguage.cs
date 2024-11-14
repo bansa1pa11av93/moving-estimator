@@ -7,15 +7,8 @@ using System.Threading.Tasks;
 
 namespace MovingEstimator
 {
-    enum ELanguage
-    {
-        French,
-        English,
-    }
-
     public interface ILanguage
     {
-        string Step1();
         string LegalName();
         string Title();
         string Email();

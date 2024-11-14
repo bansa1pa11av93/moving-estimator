@@ -382,11 +382,6 @@ namespace MovingEstimator.Languages
             return "STATIONARY BIKES";
         }
 
-        public string Step1()
-        {
-            return "STEP 1 - CUSTOMER INFORMATION";
-        }
-
         public string Suitcases()
         {
             return "SUITCASES";
