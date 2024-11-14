@@ -59,1793 +59,903 @@ namespace MovingEstimator
                 // divides text into lines
                 string[] s_Lines = Move_description.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
                 int n_Line = 0;
-                // french or english  form ?
-                //French form
+  
+                // Choose language
                 if (Move_description.Text.Contains(GFrenchToDetect))
                 {
-                    string key, value;
-                    string[] arr;
-                    while (n_Line < s_Lines.Length)
-                    {
-                        arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
-                        if (arr.Length < 2)
-                        {
-                            ++n_Line;
-                            continue;
-                        }
-
-                        key = arr[0].Trim();
-                        value = arr[1].Trim();
-
-                        if (key.Contains("NOM ET PRÉNOM"))
-                        {
-                            s_client_name = value;
-                        }
-                        else if (key.Contains("TITRE"))
-                        {
-                            string title_and_name = value;
-                            title_and_name += " " + s_client_name;
-                            s_client_name = title_and_name;
-                        }
-                        if (key.Contains("COURRIEL"))
-                        {
-                            s_client_email = value;
-                        }
-                        if (key.Contains("TÉLÉPHONE"))
-                        {
-                            s_client_phn_number = value;
-                        }
-                        if (key.Contains("DATE") && !key.Contains("FLEXIBLE"))
-                        {
-                            //delete date
-                            s_moving_date = value;
-                            DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
-                            monthCalendar1.SetDate(dt1);
-                            monthCalendar2.SetDate(dt1);
-                            monthCalendar3.SetDate(dt1);
-
-                        }
-                        if (key.Contains("DATE FLEXIBLE ?"))
-                        {
-                            //DATE FLEXIBLE ?	DATE EXACTE
-                            label_flexible_date.Text = value;
-                        }
-                        if (key.Contains("ADRESSE DE DÉPART + VILLE"))
-                        {
-                            textBox_Starting_address.Text = value;
-                        }
-                        if (key.Contains("ADRESSE DESTINATION + VILLE"))
-                        {
-                            //delete ADRESSE DE DÉPART + VILLE
-                            textBox_Destination_address.Text = value;
-                        }
-                        if (key.Contains("ÉTAGE ADRESSE DE DÉPART"))
-                        {
-                            //delete ADRESSE DE DÉPART
-                            textBox_Starting_address_floor.Text = value;
-                        }
-                        if (key.Contains("ÉTAGE ADRESSE DE DESTINATION"))
-                        {
-                            //delete ADRESSE DE DÉPART
-                            textBox_Destination_address_floor.Text = value;
-                        }
-                        if (key.Contains("RÉFRIGÉRATEUR"))
-                        {
-                            if (!key.Contains("PETIT") && !key.Contains("GRAND"))// both previous ifs were false
-                            {
-                                //RÉFRIGÉRATEUR	1
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += "x RÉFRIGÉRATEUR; ";
-                                    dVolume += n_items;
-                                    dLoading_time += n_items * 0.15;
-                                    dUnLoading_time += n_items * 0.1;
-                                }
-                            }
-                            if (key.Contains("GRAND"))
-                            {
-                                //GRAND RÉFRIGÉRATEUR	1 
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items; // number of fridges
-                                    s_inventory += "x GRAND RÉFRIGÉRATEUR; ";
-                                    dVolume += n_items * 1.3;
-                                    dLoading_time += n_items * 0.2;
-                                    dUnLoading_time += n_items * 0.15;
-                                }
-                            }
-                            if (key.Contains("PETIT"))
-                            {
-                                //PETIT RÉFRIGÉRATEUR 1
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += "x PETIT RÉFRIGÉRATEUR; ";
-                                    dVolume += n_items * 0.5;
-                                    dLoading_time += n_items * 0.15;
-                                    dUnLoading_time += n_items * 0.1;
-                                }
-                            }
-                        }// fridges
-                        if (key.Contains("GROS CONGÉLATEUR"))
-                        {
-                            //GROS CONGÉLATEUR    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x GROS CONGÉLATEUR; ";
-
-                                dVolume += n_items;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.12;
-                            }
-                        }
-                        if (key.Contains("CONGÉLATEUR MOYEN"))
-                        {
-                            //CONGÉLATEUR MOYEN   1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x CONGÉLATEUR MOYEN; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("CUISINIÈRES - FOUR/POÊLE"))
-                        {
-                            //CUISINIÈRES - FOUR / POÊLE    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x CUISINIÈRES - FOUR / POÊLE; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("LAVE VAISSELLE"))
-                        {
-                            //LAVE VAISSELLE    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x LAVE VAISSELLE; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains("SÉCHEUSE") && !key.Contains("SUPERPOSÉES"))
-                        {
-                            //SÉCHEUSE    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x SÉCHEUSE; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains("LAVEUSE") && !key.Contains("SUPERPOSÉES"))
-                        {
-                            //LAVEUSE    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x LAVEUSE; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains("Sécheuse au dessus laveuse"))
-                        {
-                            //LAVEUSE - SECHEUSE SUPERPOSÉES ?	Sécheuse au dessus laveuse
-                            s_inventory += " Sécheuse au dessus laveuse; ";
-                            dLoading_time += 0.1;
-                            dUnLoading_time += 0.1;
-                        }
-                        if (key.Contains("BASE DE LIT KING"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BASE DE LIT KING; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.2;
-                                dUnLoading_time += n_items * 0.13;
-                            }
-                        }
-                        if (key.Contains("BASE DE LIT QUEEN"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BASE DE LIT QUEEN; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.11;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("BASE DE LIT DOUBLE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BASE DE LIT DOUBLE; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.11;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("BASE DE LIT SIMPLE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BASE DE LIT SIMPLE; ";
-
-                                dVolume += n_items * .25;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains("MATELAS KING"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += 2 * n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x MATELAS KING; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains("MATELAS QUEEN"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x MATELAS QUEEN; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("MATELAS DOUBLE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x MATELAS DOUBLE; ";
-
-                                dVolume += n_items * .35;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("MATELAS SIMPLE"))
-                        {
-                            Console.WriteLine(s_Lines[n_Line]);
-                            //MATELAS SIMPLE(PETIT)
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x MATELAS SIMPLE(PETIT); ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("SOMMIER KING"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x SOMMIER KING; ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("SOMMIER SIMPLE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x SOMMIER SIMPLE; ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("SOMMIER QUEEN"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x SOMMIER QUEEN; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("SOMMIER DOUBLE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x SOMMIER DOUBLE; ";
-
-                                dVolume += n_items * .25;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("COMMODE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x COMMODE; ";
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("TABLE DE CHEVET"))
-                        {
-                            //TABLE DE CHEVET 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x TABLE DE CHEVET; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.07;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains("(2 PORTES)"))
-                        {
-                            //ARMOIRE(2 PORTES)  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x ARMOIRE(2 PORTES); ";
-                                dVolume += n_items * .8;
-                                dLoading_time += n_items * 0.12;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains("(1 PORTE)"))
-                        {
-                            //ARMOIRE(1 PORTE)  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x ARMOIRE(1 PORTE); ";
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("BERCEAU"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BERCEAU; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.08;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains("CAUSEUSE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x CAUSEUSE(DIVAN 2 PLACES); ";
-
-                                dVolume += n_items * 1.0;
-                                dLoading_time += n_items * 0.12;
-                                dUnLoading_time += n_items * 0.06;
-                            }
-                        }
-                        if (key.Contains("CANAPÉ"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x SOFA/CANAPÉ (3PLACES); ";
-
-                                dVolume += n_items * 1.3;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.10;
-                            }
-                        }
-                        if (key.Contains("FAUTEUIL"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x FAUTEUIL; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("MEUBLE TÉLÉ"))
-                        {
-                            if (key.Contains("GRAND"))
-                            {
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x MEUBLE TÉLÉ(GRAND);  ";
-                                    dVolume += n_items * 1.2;
-                                    dLoading_time += n_items * 0.3;
-                                    dUnLoading_time += n_items * 0.2;
-                                }
-                            }
-                            if (key.Contains("MOYEN"))
-                            {
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x MEUBLE TÉLÉ(MOYEN/ PETIT); ";
-                                    dVolume += n_items * 0.4;
-                                    dLoading_time += n_items * 0.1;
-                                    dUnLoading_time += n_items * 0.05;
-                                }
-                            }
-                        }
-
-                        if (key.Contains("TÉLÉVISEUR"))
-                        {
-                            if (key.Contains("GRAND"))
-                            {// TÉLÉVISEUR(GRAND) 2
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x TÉLÉVISEUR(GRAND);  ";
-                                    dVolume += n_items * 0.3;
-                                    dLoading_time += n_items * 0.1;
-                                    dUnLoading_time += n_items * 0.1;
-                                }
-                            }
-                            if (key.Contains("MOYEN"))
-                            {
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x TÉLÉVISEUR (MOYEN/PETIT);  ";
-                                    dVolume += n_items * 0.1;
-                                    dLoading_time += n_items * 0.05;
-                                    dUnLoading_time += n_items * 0.05;
-                                }
-                            }
-                        }
-
-                        if (key.Contains("TABLE DE CAFÉ, DE BOUT"))
-                        {//TABLE DE CAFÉ, DE BOUT  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x TABLE DE CAFÉ, DE BOUT; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("TABLES À MANGER OU DE TERRASSE"))
-                        {//TABLES À MANGER  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x TABLES À MANGER OU DE TERRASSE; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains("CHAISES"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x CHAISES; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("BIBILIOTHEQUE"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BIBILIOTHEQUE; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("ARMOIRE DE DOSSIER"))
-                        {
-                            //ARMOIRE DE DOSSIER À TIROIR 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x ARMOIRE DE DOSSIER À TIROIR; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains("DESSERTE, HUCHE, CABINETS"))
-                        {
-                            //DESSERTE, HUCHE, CABINETS   1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x DESSERTE, HUCHE, CABINETS; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains("MIROIRS - CADRES"))
-                        {
-                            //MIROIRS - CADRES    2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x MIROIRS - CADRES; ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("GRAND TAPIS"))
-                        {
-                            //GRAND TAPIS 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x GRAND TAPIS; ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.1;
-                            }
-                        }
-                        if (key.Contains("TAPIS ( PETIT OU MOYEN )"))
-                        {
-                            //TAPIS ( PETIT OU MOYEN )	1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x TAPIS ( PETIT OU MOYEN ); ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("LAMPES ET ABAT-JOURS"))
-                        {
-                            //LAMPE 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x LAMPES ET ABAT-JOURS; ";
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("COFFRE FORT"))
-                        {
-                            if (key.Contains("Petit"))
-                            {
-                                s_inventory += " COFFRE FORT Petit; ";
-                                dVolume += .4;
-                                dLoading_time += 0.04;
-                                dUnLoading_time += 0.03;
-                            }
-                            if (key.Contains("Moyen"))
-                            {
-                                s_inventory += "---- COFFRE FORT Moyen ( maximum 300 lbs, sinon 1h extra); ----";
-                                dVolume += .6;
-                                dLoading_time += 0.4;
-                                dUnLoading_time += 0.2;
-                            }
-                            if (key.Contains("Grand"))
-                            {
-                                s_inventory += "---- COFFRE FORT Grand ( maximum 300 lbs, sinon 1h extra); ----";
-                                dVolume += 1.2;
-                                dLoading_time += 1.5;// 1 h exrtra
-                                dUnLoading_time += .5;
-                            }
-                        }
-                        if (key.Contains("PIANO"))
-                        {
-                            if (key.Contains("Petit"))
-                            {
-                                s_inventory += " PIANO Petit; ";
-                                dVolume += .4;
-                                dLoading_time += 0.04;
-                                dUnLoading_time += 0.03;
-                            }
-                            if (key.Contains("Moyen"))
-                            {
-                                s_inventory += "---- PIANO Moyen ( maximum 300 lbs, sinon 1h extra); ----";
-                                dVolume += .6;
-                                dLoading_time += 1.4;
-                                dUnLoading_time += 0.2;
-                            }
-                            if (key.Contains("Grand"))
-                            {
-                                s_inventory += "---- PIANO Grand ( maximum 300 lbs, sinon 2h extra); ----";
-                                dVolume += 1.2;
-                                dLoading_time += 2.5;// 2 h exrtra
-                                dUnLoading_time += .5;
-                            }
-                        }
-                        if (key.Contains("BARBECUE"))
-                        {
-                            //BARBECUE	2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x BARBECUE; ";
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.04;
-                            }
-                        }
-                        if (key.Contains("BICYCLETTES / VÉLOS"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x VÉLO; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains("VALISES"))
-                        {
-                            //VALISES	2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x VALISES; ";
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("PNEUS"))
-                        {
-                            //PNEUS   13
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x PNEUS; ";
-
-                                dVolume += n_items * .15;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains("TAPIS ROULANT"))
-                        {
-                            //TAPIS ROULANT   1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x TAPIS ROULANT; ";
-                                dVolume += n_items * .8;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.15;
-                            }
-                        }
-                        if (key.Contains("VÉLOS STATIONNAIRES"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x VÉLOS STATIONNAIRES; ";
-                                dVolume += n_items;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.1;
-                            }
-                        }
-                        if (key.Contains("TABLE DE BILLARD"))
-                        {
-                            //TABLE DE BILLARD    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += "\n---- " + n_items + " x TABLE DE BILLARD; ----\n";
-
-                                dVolume += n_items * 15;
-                                dLoading_time += n_items * 3;
-                                dUnLoading_time += n_items * 3;
-                            }
-                        }
-                        if (key.Contains("VOS BOITES (APPROXIMATIF)"))
-                        {
-                            //BOITES(APPROXIMATIF)   250
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " de vos BOITES(APPROXIMATIF);";
-
-                                dVolume += n_items * .15;
-                                dLoading_time += n_items * .015;
-                                dUnLoading_time += n_items * .01;
-                            }
-                        }
-                        if (key.Contains("BOITES GARDE-ROBE (4 FOURNIES)"))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                nWardrobe_boxes += n_items;
-                                s_inventory += " x BOITE GARDE-ROBE(4 FOURNIES);";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * .075;
-                                dUnLoading_time += n_items * .03;
-                            }
-                        }
-                        if (key.Contains("PLUS DE PRÉCISIONS"))
-                        {
-                            //PLUS DE PRÉCISIONS 
-                            s_Lines[n_Line] = value;
-                            s_notes += "\nNotes client:\n ";
-                            s_notes += s_Lines[n_Line] + " \n";
-                        }
-                        if (key.Contains("COMMENT AVEZ-VOUS"))
-                        {
-                            s_notes += " \n" + s_Lines[n_Line];
-                            textBox_Destination_source.Text = value;
-                        }
-                        n_Line++;
-                        n_items = 0;
-                    }
-                }// french form
-                // English form
-                if (Move_description.Text.Contains(GEnglishToDetect))
+                    language = new French();
+                }
+                else if (Move_description.Text.Contains(GEnglishToDetect))
                 {
                     language = new English();
+                }
 
-                    string key, value;
-                    string[] arr;
-                    while (n_Line < s_Lines.Length)
+                string key, value;
+                string[] arr;
+                while (n_Line < s_Lines.Length)
+                {
+                    arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
+                    if (arr.Length < 2)
                     {
-                        arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
-                        if (arr.Length < 2)
-                        {
-                            ++n_Line;
-                            continue;
-                        }
+                        ++n_Line;
+                        continue;
+                    }
 
-                        key = arr[0].Trim();
-                        value = arr[1].Trim();
+                    key = arr[0].Trim();
+                    value = arr[1].Trim();
 
-                        if (key.Contains(language.LegalName()))
-                        {
-                            // delete FIRST NAME
-                            s_client_name += value;
-                            // add separator
-                            s_client_name += ' ';
-                        }
-                        if (key.Contains(language.Title()))
-                        {
-                            //delete TITLE
-                            string title_and_name = value;
-                            title_and_name += " " + s_client_name;
-                            s_client_name = title_and_name;
+                    if (key.Contains(language.LegalName()))
+                    {
+                        // delete FIRST NAME
+                        s_client_name += value;
+                        // add separator
+                        s_client_name += ' ';
+                    }
+                    if (key.Contains(language.Title()))
+                    {
+                        //delete TITLE
+                        string title_and_name = value;
+                        title_and_name += " " + s_client_name;
+                        s_client_name = title_and_name;
 
-                        }
-                        if (key.Contains(language.Email()))
-                        {
-                            //delete E-MAIL
-                            s_client_email = value;
-                        }
-                        if (key.Contains(language.Phone()))
-                        {
-                            //delete PHONE
-                            s_client_phn_number = value;
-                        }
-                        if (key.Contains(language.MovingDate()))
-                        {
-                            //delete DATED
-                            s_moving_date = value;
-                            label_flexible_date.Text = s_moving_date;
-                            DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
+                    }
+                    if (key.Contains(language.Email()))
+                    {
+                        //delete E-MAIL
+                        s_client_email = value;
+                    }
+                    if (key.Contains(language.Phone()))
+                    {
+                        //delete PHONE
+                        s_client_phn_number = value;
+                    }
+                    if (key == language.MovingDate())
+                    {
+                        //delete DATED
+                        s_moving_date = value;
+                        label_flexible_date.Text = s_moving_date;
+                        DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
 
-                            monthCalendar1.SetDate(dt1);
-                            monthCalendar2.SetDate(dt1);
-                            monthCalendar3.SetDate(dt1);
-                        }
-                        if (key.Contains(language.FlexibleDate()))
+                        monthCalendar1.SetDate(dt1);
+                        monthCalendar2.SetDate(dt1);
+                        monthCalendar3.SetDate(dt1);
+                    }
+                    if (key.Contains(language.FlexibleDate()))
+                    {
+                        label_flexible_date.Text = value;
+                    }
+                    if (key.Contains(language.DepartureAddressCity()))
+                    {
+                        //delete DEPARTURE ADDRESS + CITY
+                        textBox_Starting_address.Text = value;
+                    }
+                    if (key.Contains(language.DestinationAddressCity()))
+                    {
+                        //delete DESTINATION ADDRESS + CITY
+                        textBox_Destination_address.Text = value;
+                    }
+                    if (key.Contains(language.FloorDeparture()))
+                    {
+                        //FLOOR DEPARTURE ADDRESS
+                        textBox_Starting_address_floor.Text = value;
+                    }
+                    if (key.Contains(language.FloorDestination()))
+                    {
+                        //delete FLOOR DESTINATION ADDRESS
+                        textBox_Destination_address_floor.Text = value;
+                    }
+                    if (key.Contains(language.Refrigerator()))
+                    {
+                        if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
                         {
-                            label_flexible_date.Text = value;
-                        }
-                        if (key.Contains(language.DepartureAddressCity()))
-                        {
-                            //delete DEPARTURE ADDRESS + CITY
-                            textBox_Starting_address.Text = value;
-                        }
-                        if (key.Contains(language.DestinationAddressCity()))
-                        {
-                            //delete DESTINATION ADDRESS + CITY
-                            textBox_Destination_address.Text = value;
-                        }
-                        if (key.Contains(language.FloorDeparture()))
-                        {
-                            //FLOOR DEPARTURE ADDRESS
-                            textBox_Starting_address_floor.Text = value;
-                        }
-                        if (key.Contains(language.FloorDestination()))
-                        {
-                            //delete FLOOR DESTINATION ADDRESS
-                            textBox_Destination_address_floor.Text = value;
-                        }
-                        if (key.Contains(language.Refrigerator()))
-                        {
-                            if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
-                            {
-                                //REFRIGERATOR	1
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += "x " + language.Refrigerator() + "; ";
-                                    dVolume += n_items;
-                                    dLoading_time += n_items * 0.15;
-                                    dUnLoading_time += n_items * 0.1;
-                                }
-                            }
-                            if (key.Contains(language.Large()))
-                            {
-                                //LARGE REFRIGERATOR	1 
-                                s_Lines[n_Line] = value;// delete "LARGE REFRIGERATOR"
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items; // number of LARGE REFRIGERATOR
-                                    s_inventory += "x " + language.Large() + " " + language.Refrigerator() + "; ";
-                                    dVolume += n_items * 1.3;
-                                    dLoading_time += n_items * 0.2;
-                                    dUnLoading_time += n_items * 0.15;
-                                }
-                            }
-                            if (key.Contains(language.Small()))
-                            {
-                                //SMALL REFRIGERATOR	1
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += "x " + language.Small() + " " + language.Refrigerator() + "; ";
-                                    dVolume += n_items * 0.5;
-                                    dLoading_time += n_items * 0.15;
-                                    dUnLoading_time += n_items * 0.1;
-                                }
-                            }
-                        }// fridges
-                        if (key.Contains(language.LargeFreezer()))
-                        {
-                            //LARGE FREEZER   1
+                            //REFRIGERATOR	1
                             s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
-                                s_inventory += " x " + language.LargeFreezer() + "; ";
-
+                                s_inventory += "x " + language.Refrigerator() + "; ";
                                 dVolume += n_items;
                                 dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.12;
+                                dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (key.Contains(language.MediumFreezer()))
+                        if (key.Contains(language.Large()))
                         {
-                            //MEDIUM FREEZER   1
-                            s_Lines[n_Line] = value;
+                            //LARGE REFRIGERATOR	1 
+                            s_Lines[n_Line] = value;// delete "LARGE REFRIGERATOR"
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.MediumFreezer() + "; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.CookersOvenStove()))
-                        {
-                            //COOKERS - OVEN / STOVE    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.CookersOvenStove() + "; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.Dishwasher()))
-                        {
-                            //DISHWASHER    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Dishwasher() + "; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
-                        {
-                            //DRYER    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Dryer() + "; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
-                        {
-                            //WASHER    1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Washer() + "; ";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains(language.DryerAboveWasher()))
-                        {
-                            s_inventory += " " + language.DryerAboveWasher() + "; ";
-                            dLoading_time += 0.1;
-                            dUnLoading_time += 0.1;
-                        }
-                        if (key.Contains(language.KingBedBase()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.KingBedBase() + "; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.2;
-                                dUnLoading_time += n_items * 0.13;
-                            }
-                        }
-                        if (key.Contains(language.QueenBedBase()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.QueenBedBase() + "; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.11;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.DoubleBedBase()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.DoubleBedBase() + "; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.11;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.SingleBedBase()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.SingleBedBase() + "; ";
-
-                                dVolume += n_items * .25;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.07;
-                            }
-                        }
-                        if (key.Contains(language.KingMattress()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += 2 * n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.KingMattress() + "; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains(language.QueenMattress()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.QueenMattress() + "; ";
-
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains(language.DoubleMattress()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.DoubleMattress() + "; ";
-
-                                dVolume += n_items * .35;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.SingleMattressSmall()))
-                        {
-                            //SINGLE MATTRESS (SMALL)
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.SingleMattressSmall() + "; ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.BoxspringKing()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.BoxspringKing() + "; ";
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.BoxspringSingle()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.BoxspringSingle() + "; ";
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.BoxspringQueen()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.BoxspringQueen() + "; ";
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains(language.BoxspringDouble()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            nPlastic_bags += n_items;
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.BoxspringDouble() + "; ";
-                                dVolume += n_items * .25;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains(language.Commode()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Commode() + "; ";
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.Nightstand()))
-                        {
-                            //TABLE DE CHEVET 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Nightstand() + "; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.07;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains(language.Wardrobe2Doors()))
-                        {
-                            //ARMOIRE(2 PORTES)  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Wardrobe2Doors() + "; ";
-                                dVolume += n_items * .8;
-                                dLoading_time += n_items * 0.12;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains(language.Wardrobe1Door()))
-                        {
-                            //WARDROBE (1 DOOR)  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Wardrobe1Door() + "; ";
-
-                                dVolume += n_items * .3;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains(language.Cradle()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Cradle() + "; ";
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.08;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains(language.Loveseat2SeaterSofa()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Loveseat2SeaterSofa() + "; ";
-
-                                dVolume += n_items * 1.0;
-                                dLoading_time += n_items * 0.12;
-                                dUnLoading_time += n_items * 0.06;
-                            }
-                        }
-                        if (key.Contains(language.Sofa3Seater()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Sofa3Seater() + "; ";
+                                s_inventory += n_items; // number of LARGE REFRIGERATOR
+                                s_inventory += "x " + language.Large() + " " + language.Refrigerator() + "; ";
                                 dVolume += n_items * 1.3;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.10;
-                            }
-                        }
-                        if (key.Contains(language.Armchair()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Armchair() + "; ";
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-
-                        if (key.Contains(language.TvStand()))
-                        {
-                            if (key.Contains(language.Large()))
-                            {
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x " + language.TvStand() + " (" + language.Large() + "); ";
-                                    dVolume += n_items * 1.2;
-                                    dLoading_time += n_items * 0.3;
-                                    dUnLoading_time += n_items * 0.2;
-                                }
-                            }
-                            if (key.Contains(language.MediumSmall()))
-                            {
-                                s_Lines[n_Line] = value;
-                                n_items = int.Parse(s_Lines[n_Line]);
-                                if (n_items > 0)
-                                {
-                                    s_inventory += n_items;
-                                    s_inventory += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
-                                    dVolume += n_items * 0.4;
-                                    dLoading_time += n_items * 0.1;
-                                    dUnLoading_time += n_items * 0.05;
-                                }
-                            }
-                        }
-
-                        if (key.Contains(language.LargeTv()))
-                        {// TÉLÉVISEUR(GRAND) 2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.LargeTv() + ";  ";
-                                dVolume += n_items * 0.3;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.1;
-                            }
-                        }
-                        if (key.Contains(language.MediumSmallTv()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.MediumSmallTv() + ";  ";
-                                dVolume += n_items * 0.1;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-
-                        if (key.Contains(language.CoffeeAndSideTables()))
-                        {//COFFEE AND SIDE TABLES  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.CoffeeAndSideTables() + "; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.05;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.DiningOrPatioTables()))
-                        {//DINING OR PATIO TABLES  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.DiningOrPatioTables() + "; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.05;
-                            }
-                        }
-                        if (key.Contains(language.Chairs()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Chairs() + "; ";
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.Library()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Library() + "; ";
-                                dVolume += n_items * .4;
-                                dLoading_time += n_items * 0.03;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.DrawerFolderCabinet()))
-                        {
-                            //DRAWER FOLDER CABINET 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.DrawerFolderCabinet() + "; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.03;
-                            }
-                        }
-                        if (key.Contains(language.DessertHucheCabinets()))
-                        {
-                            //DESSERT, HUCHE, CABINETS  1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.DessertHucheCabinets() + "; ";
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.08;
-                            }
-                        }
-                        if (key.Contains(language.MirrorsFrames()))
-                        {
-                            //MIRRORS - FRAMES    2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.MirrorsFrames() + "; ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.LargeCarpet()))
-                        {
-                            //LARGE CARPET 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.LargeCarpet() + "; ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.1;
-                            }
-                        }
-                        if (key.Contains(language.SmallMediumCarpet()))
-                        {
-                            //LARGE CARPET 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.SmallMediumCarpet() + "; ";
-                                dVolume += n_items * .1;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.LampsAndLampShades()))
-                        {
-                            //LAMPE 1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.LampsAndLampShades() + "; ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.Safe()))
-                        {
-                            if (key.Contains(language.SentenceSmall()))
-                            {
-                                s_inventory += " Small SAFE; ";
-                                dVolume += .4;
-                                dLoading_time += 0.04;
-                                dUnLoading_time += 0.03;
-                            }
-                            if (key.Contains(language.SentenceAverage()))
-                            {
-                                s_inventory += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                                dVolume += .6;
-                                dLoading_time += 0.4;
-                                dUnLoading_time += 0.2;
-                            }
-                            if (key.Contains(language.SentenceBig()))
-                            {
-                                s_inventory += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                                dVolume += 1.2;
-                                dLoading_time += 1.5;// 1 h exrtra
-                                dUnLoading_time += 0.5;
-                            }
-                        }
-                        if (key.Contains(language.Piano()))
-                        {
-                            if (key.Contains(language.SentenceSmall()))
-                            {
-                                s_inventory += " SMALL PIANO; ";
-                                dVolume += .4;
-                                dLoading_time += 0.04;
-                                dUnLoading_time += 0.03;
-                            }
-                            if (key.Contains(language.SentenceAverage()))
-                            {
-                                s_inventory += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
-                                dVolume += .6;
-                                dLoading_time += 0.4;
-                                dUnLoading_time += 0.2;
-                            }
-                            if (key.Contains(language.SentenceBig()))
-                            {
-                                s_inventory += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
-                                dVolume += 1.2;
-                                dLoading_time += 1.5;// 1 h exrtra
-                                dUnLoading_time += .5;
-                            }
-                        }
-                        if (key.Contains(language.Barbecue()))
-                        {
-                            //BARBECUE	2
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Barbecue() + "; ";
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * 0.04;
-                                dUnLoading_time += n_items * 0.04;
-                            }
-                        }
-                        if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
-                        {
-                            //VÉLO	1
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Bike() + "; ";
-
-                                dVolume += n_items * .5;
-                                dLoading_time += n_items * 0.02;
-                                dUnLoading_time += n_items * 0.02;
-                            }
-                        }
-                        if (key.Contains(language.Suitcases()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Suitcases() + "; ";
-
-                                dVolume += n_items * .2;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.Tires()))
-                        {
-                            //PNEUS   13
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Tires() + "; ";
-
-                                dVolume += n_items * .15;
-                                dLoading_time += n_items * 0.01;
-                                dUnLoading_time += n_items * 0.01;
-                            }
-                        }
-                        if (key.Contains(language.Treadmill()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.Treadmill() + "; ";
-                                dVolume += n_items * .8;
-                                dLoading_time += n_items * 0.15;
+                                dLoading_time += n_items * 0.2;
                                 dUnLoading_time += n_items * 0.15;
                             }
                         }
-                        if (key.Contains(language.StationaryBikes()))
+                        if (key.Contains(language.Small()))
                         {
+                            //SMALL REFRIGERATOR	1
                             s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
                                 s_inventory += n_items;
-                                s_inventory += " x " + language.StationaryBikes() + "; ";
-                                dVolume += n_items;
-                                dLoading_time += n_items * 0.1;
+                                s_inventory += "x " + language.Small() + " " + language.Refrigerator() + "; ";
+                                dVolume += n_items * 0.5;
+                                dLoading_time += n_items * 0.15;
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (key.Contains(language.PoolTable()))
+                    }// fridges
+                    if (key.Contains(language.LargeFreezer()))
+                    {
+                        //LARGE FREEZER   1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
                         {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += "\n---- " + n_items + " x " + language.PoolTable() + "; ----\n";
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.LargeFreezer() + "; ";
 
-                                dVolume += n_items * 15;
-                                dLoading_time += n_items * 3;
-                                dUnLoading_time += n_items * 3;
-                            }
+                            dVolume += n_items;
+                            dLoading_time += n_items * 0.15;
+                            dUnLoading_time += n_items * 0.12;
                         }
-                        if (key.Contains(language.YourBoxesApproximate()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.YourBoxesApproximate() + ";";
-                                dVolume += n_items * .15;
-                                dLoading_time += n_items * .015;
-                                dUnLoading_time += n_items * .01;
-                            }
-                        }
-                        if (key.Contains(language.WardrobeBoxes4Provided()))
-                        {
-                            s_Lines[n_Line] = value;
-                            n_items = int.Parse(s_Lines[n_Line]);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                nWardrobe_boxes += n_items;
-                                s_inventory += " x " + language.WardrobeBoxes4Provided() + ";";
-
-                                dVolume += n_items * .6;
-                                dLoading_time += n_items * .075;
-                                dUnLoading_time += n_items * .03;
-                            }
-                        }
-                        if (key.Contains(language.MoreDetails()))
-                        {
-                            //PLUS DE PRÉCISIONS rien pour l\'instant
-                            s_Lines[n_Line] = value;
-                            s_notes += "\n" + language.MoreDetails() + ": ";
-                            s_notes += s_Lines[n_Line];
-                        }
-                        if (key.Contains(language.HowDidYouHearAboutUs()))
-                        {
-                            s_notes += '\n' + s_Lines[n_Line];
-                            textBox_Destination_source.Text = value;
-                        }
-
-                        n_Line++;
-                        n_items = 0;
                     }
-                }// English form
+                    if (key.Contains(language.MediumFreezer()))
+                    {
+                        //MEDIUM FREEZER   1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.MediumFreezer() + "; ";
+
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.CookersOvenStove()))
+                    {
+                        //COOKERS - OVEN / STOVE    1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.CookersOvenStove() + "; ";
+
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.Dishwasher()))
+                    {
+                        //DISHWASHER    1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Dishwasher() + "; ";
+
+                            dVolume += n_items * .4;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.07;
+                        }
+                    }
+                    if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
+                    {
+                        //DRYER    1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Dryer() + "; ";
+
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.07;
+                        }
+                    }
+                    if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
+                    {
+                        //WASHER    1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Washer() + "; ";
+
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.07;
+                        }
+                    }
+                    if (key.Contains(language.DryerAboveWasher()))
+                    {
+                        s_inventory += " " + language.DryerAboveWasher() + "; ";
+                        dLoading_time += 0.1;
+                        dUnLoading_time += 0.1;
+                    }
+                    if (key.Contains(language.KingBedBase()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.KingBedBase() + "; ";
+
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.2;
+                            dUnLoading_time += n_items * 0.13;
+                        }
+                    }
+                    if (key.Contains(language.QueenBedBase()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.QueenBedBase() + "; ";
+
+                            dVolume += n_items * .3;
+                            dLoading_time += n_items * 0.11;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.DoubleBedBase()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.DoubleBedBase() + "; ";
+
+                            dVolume += n_items * .3;
+                            dLoading_time += n_items * 0.11;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.SingleBedBase()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.SingleBedBase() + "; ";
+
+                            dVolume += n_items * .25;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.07;
+                        }
+                    }
+                    if (key.Contains(language.KingMattress()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += 2 * n_items;
+                        if (n_items > 0)
+                        {
+
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.KingMattress() + "; ";
+
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.15;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+                    if (key.Contains(language.QueenMattress()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.QueenMattress() + "; ";
+
+                            dVolume += n_items * .4;
+                            dLoading_time += n_items * 0.05;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+                    if (key.Contains(language.DoubleMattress()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.DoubleMattress() + "; ";
+
+                            dVolume += n_items * .35;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.SingleMattressSmall()))
+                    {
+                        //SINGLE MATTRESS (SMALL)
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.SingleMattressSmall() + "; ";
+
+                            dVolume += n_items * .2;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.BoxspringKing()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.BoxspringKing() + "; ";
+                            dVolume += n_items * .2;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.BoxspringSingle()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.BoxspringSingle() + "; ";
+                            dVolume += n_items * .2;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.BoxspringQueen()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.BoxspringQueen() + "; ";
+                            dVolume += n_items * .3;
+                            dLoading_time += n_items * 0.04;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+                    if (key.Contains(language.BoxspringDouble()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        nPlastic_bags += n_items;
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.BoxspringDouble() + "; ";
+                            dVolume += n_items * .25;
+                            dLoading_time += n_items * 0.04;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+                    if (key.Contains(language.Commode()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Commode() + "; ";
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.Nightstand()))
+                    {
+                        //TABLE DE CHEVET 1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Nightstand() + "; ";
+
+                            dVolume += n_items * .3;
+                            dLoading_time += n_items * 0.07;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+                    if (key.Contains(language.Wardrobe2Doors()))
+                    {
+                        //ARMOIRE(2 PORTES)  1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Wardrobe2Doors() + "; ";
+                            dVolume += n_items * .8;
+                            dLoading_time += n_items * 0.12;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+                    if (key.Contains(language.Wardrobe1Door()))
+                    {
+                        //WARDROBE (1 DOOR)  1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Wardrobe1Door() + "; ";
+
+                            dVolume += n_items * .3;
+                            dLoading_time += n_items * 0.05;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+                    if (key.Contains(language.Cradle()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Cradle() + "; ";
+                            dVolume += n_items * .4;
+                            dLoading_time += n_items * 0.08;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+                    if (key.Contains(language.Loveseat2SeaterSofa()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Loveseat2SeaterSofa() + "; ";
+
+                            dVolume += n_items * 1.0;
+                            dLoading_time += n_items * 0.12;
+                            dUnLoading_time += n_items * 0.06;
+                        }
+                    }
+                    if (key.Contains(language.Sofa3Seater()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Sofa3Seater() + "; ";
+                            dVolume += n_items * 1.3;
+                            dLoading_time += n_items * 0.15;
+                            dUnLoading_time += n_items * 0.10;
+                        }
+                    }
+                    if (key.Contains(language.Armchair()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Armchair() + "; ";
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+
+                    if (key.Contains(language.TvStand()))
+                    {
+                        if (key.Contains(language.Large()))
+                        {
+                            s_Lines[n_Line] = value;
+                            n_items = int.Parse(s_Lines[n_Line]);
+                            if (n_items > 0)
+                            {
+                                s_inventory += n_items;
+                                s_inventory += " x " + language.TvStand() + " (" + language.Large() + "); ";
+                                dVolume += n_items * 1.2;
+                                dLoading_time += n_items * 0.3;
+                                dUnLoading_time += n_items * 0.2;
+                            }
+                        }
+                        if (key.Contains(language.MediumSmall()))
+                        {
+                            s_Lines[n_Line] = value;
+                            n_items = int.Parse(s_Lines[n_Line]);
+                            if (n_items > 0)
+                            {
+                                s_inventory += n_items;
+                                s_inventory += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
+                                dVolume += n_items * 0.4;
+                                dLoading_time += n_items * 0.1;
+                                dUnLoading_time += n_items * 0.05;
+                            }
+                        }
+                    }
+
+                    if (key.Contains(language.LargeTv()))
+                    {// TÉLÉVISEUR(GRAND) 2
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.LargeTv() + ";  ";
+                            dVolume += n_items * 0.3;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.1;
+                        }
+                    }
+                    if (key.Contains(language.MediumSmallTv()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.MediumSmallTv() + ";  ";
+                            dVolume += n_items * 0.1;
+                            dLoading_time += n_items * 0.05;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+
+                    if (key.Contains(language.CoffeeAndSideTables()))
+                    {//COFFEE AND SIDE TABLES  1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.CoffeeAndSideTables() + "; ";
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.05;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.DiningOrPatioTables()))
+                    {//DINING OR PATIO TABLES  1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.DiningOrPatioTables() + "; ";
+
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.15;
+                            dUnLoading_time += n_items * 0.05;
+                        }
+                    }
+                    if (key.Contains(language.Chairs()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Chairs() + "; ";
+                            dVolume += n_items * .4;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.Library()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Library() + "; ";
+                            dVolume += n_items * .4;
+                            dLoading_time += n_items * 0.03;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.DrawerFolderCabinet()))
+                    {
+                        //DRAWER FOLDER CABINET 1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.DrawerFolderCabinet() + "; ";
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.04;
+                            dUnLoading_time += n_items * 0.03;
+                        }
+                    }
+                    if (key.Contains(language.DessertHucheCabinets()))
+                    {
+                        //DESSERT, HUCHE, CABINETS  1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.DessertHucheCabinets() + "; ";
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.08;
+                        }
+                    }
+                    if (key.Contains(language.MirrorsFrames()))
+                    {
+                        //MIRRORS - FRAMES    2
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.MirrorsFrames() + "; ";
+                            dVolume += n_items * .1;
+                            dLoading_time += n_items * 0.02;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.LargeCarpet()))
+                    {
+                        //LARGE CARPET 1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.LargeCarpet() + "; ";
+                            dVolume += n_items * .1;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.1;
+                        }
+                    }
+                    if (key.Contains(language.SmallMediumCarpet()))
+                    {
+                        //LARGE CARPET 1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.SmallMediumCarpet() + "; ";
+                            dVolume += n_items * .1;
+                            dLoading_time += n_items * 0.02;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.LampsAndLampShades()))
+                    {
+                        //LAMPE 1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.LampsAndLampShades() + "; ";
+
+                            dVolume += n_items * .2;
+                            dLoading_time += n_items * 0.01;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.Safe()))
+                    {
+                        if (key.Contains(language.SentenceSmall()))
+                        {
+                            s_inventory += " Small SAFE; ";
+                            dVolume += .4;
+                            dLoading_time += 0.04;
+                            dUnLoading_time += 0.03;
+                        }
+                        if (key.Contains(language.SentenceAverage()))
+                        {
+                            s_inventory += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                            dVolume += .6;
+                            dLoading_time += 0.4;
+                            dUnLoading_time += 0.2;
+                        }
+                        if (key.Contains(language.SentenceBig()))
+                        {
+                            s_inventory += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                            dVolume += 1.2;
+                            dLoading_time += 1.5;// 1 h exrtra
+                            dUnLoading_time += 0.5;
+                        }
+                    }
+                    if (key.Contains(language.Piano()))
+                    {
+                        if (key.Contains(language.SentenceSmall()))
+                        {
+                            s_inventory += " SMALL PIANO; ";
+                            dVolume += .4;
+                            dLoading_time += 0.04;
+                            dUnLoading_time += 0.03;
+                        }
+                        if (key.Contains(language.SentenceAverage()))
+                        {
+                            s_inventory += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
+                            dVolume += .6;
+                            dLoading_time += 0.4;
+                            dUnLoading_time += 0.2;
+                        }
+                        if (key.Contains(language.SentenceBig()))
+                        {
+                            s_inventory += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
+                            dVolume += 1.2;
+                            dLoading_time += 1.5;// 1 h exrtra
+                            dUnLoading_time += .5;
+                        }
+                    }
+                    if (key.Contains(language.Barbecue()))
+                    {
+                        //BARBECUE	2
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Barbecue() + "; ";
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * 0.04;
+                            dUnLoading_time += n_items * 0.04;
+                        }
+                    }
+                    if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
+                    {
+                        //VÉLO	1
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Bike() + "; ";
+
+                            dVolume += n_items * .5;
+                            dLoading_time += n_items * 0.02;
+                            dUnLoading_time += n_items * 0.02;
+                        }
+                    }
+                    if (key.Contains(language.Suitcases()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Suitcases() + "; ";
+
+                            dVolume += n_items * .2;
+                            dLoading_time += n_items * 0.01;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.Tires()))
+                    {
+                        //PNEUS   13
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Tires() + "; ";
+
+                            dVolume += n_items * .15;
+                            dLoading_time += n_items * 0.01;
+                            dUnLoading_time += n_items * 0.01;
+                        }
+                    }
+                    if (key.Contains(language.Treadmill()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.Treadmill() + "; ";
+                            dVolume += n_items * .8;
+                            dLoading_time += n_items * 0.15;
+                            dUnLoading_time += n_items * 0.15;
+                        }
+                    }
+                    if (key.Contains(language.StationaryBikes()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.StationaryBikes() + "; ";
+                            dVolume += n_items;
+                            dLoading_time += n_items * 0.1;
+                            dUnLoading_time += n_items * 0.1;
+                        }
+                    }
+                    if (key.Contains(language.PoolTable()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += "\n---- " + n_items + " x " + language.PoolTable() + "; ----\n";
+
+                            dVolume += n_items * 15;
+                            dLoading_time += n_items * 3;
+                            dUnLoading_time += n_items * 3;
+                        }
+                    }
+                    if (key.Contains(language.YourBoxesApproximate()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            s_inventory += " x " + language.YourBoxesApproximate() + ";";
+                            dVolume += n_items * .15;
+                            dLoading_time += n_items * .015;
+                            dUnLoading_time += n_items * .01;
+                        }
+                    }
+                    if (key.Contains(language.WardrobeBoxes4Provided()))
+                    {
+                        s_Lines[n_Line] = value;
+                        n_items = int.Parse(s_Lines[n_Line]);
+                        if (n_items > 0)
+                        {
+                            s_inventory += n_items;
+                            nWardrobe_boxes += n_items;
+                            s_inventory += " x " + language.WardrobeBoxes4Provided() + ";";
+
+                            dVolume += n_items * .6;
+                            dLoading_time += n_items * .075;
+                            dUnLoading_time += n_items * .03;
+                        }
+                    }
+                    if (key.Contains(language.MoreDetails()))
+                    {
+                        //PLUS DE PRÉCISIONS rien pour l\'instant
+                        s_Lines[n_Line] = value;
+                        s_notes += "\n" + language.MoreDetails() + ": ";
+                        s_notes += s_Lines[n_Line];
+                    }
+                    if (key.Contains(language.HowDidYouHearAboutUs()))
+                    {
+                        s_notes += '\n' + s_Lines[n_Line];
+                        textBox_Destination_source.Text = value;
+                    }
+
+                    n_Line++;
+                    n_items = 0;
+                }
 
                 // inventory completed and basic loading times
                 //Adjust times with floors
