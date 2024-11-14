@@ -46,14 +46,78 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILanguage.cs" />
+    <Compile Include="Languages\English.cs" />
+    <Compile Include="Languages\French.cs" />
+    <Compile Include="Products\Barbecue.cs" />
+    <Compile Include="Products\Bike.cs" />
+    <Compile Include="Products\BoxspringDouble.cs" />
+    <Compile Include="Products\BoxspringKing.cs" />
+    <Compile Include="Products\BoxspringQueen.cs" />
+    <Compile Include="Products\BoxspringSingle.cs" />
+    <Compile Include="Products\ArmChair.cs" />
+    <Compile Include="Products\CarpetLarge.cs" />
+    <Compile Include="Products\CarpetMedium.cs" />
+    <Compile Include="Products\Chairs.cs" />
+    <Compile Include="Products\CoffeeAndSideTables.cs" />
+    <Compile Include="Products\DessertHucheCabinets.cs" />
+    <Compile Include="Products\DinningOrPatioTables.cs" />
+    <Compile Include="Products\DrawerFolderCabinet.cs" />
+    <Compile Include="Products\LampsAndLampShades.cs" />
+    <Compile Include="Products\Library.cs" />
+    <Compile Include="Products\MirrorsFrames.cs" />
+    <Compile Include="Products\PianoLarge.cs" />
+    <Compile Include="Products\PianoMedium.cs" />
+    <Compile Include="Products\PianoSmall.cs" />
+    <Compile Include="Products\PoolTable.cs" />
+    <Compile Include="Products\SafeLarge.cs" />
+    <Compile Include="Products\SafeMedium.cs" />
+    <Compile Include="Products\SafeSmall.cs" />
+    <Compile Include="Products\StationaryBikes.cs" />
+    <Compile Include="Products\Suitcases.cs" />
+    <Compile Include="Products\Tires.cs" />
+    <Compile Include="Products\Treadmill.cs" />
+    <Compile Include="Products\TVLarge.cs" />
+    <Compile Include="Products\TVSmall.cs" />
+    <Compile Include="Products\TVStandLarge.cs" />
+    <Compile Include="Products\Cradle.cs" />
+    <Compile Include="Products\Loveseat2SeaterSofa.cs" />
+    <Compile Include="Products\Sofa3Seater.cs" />
+    <Compile Include="Products\TVStandMedium.cs" />
+    <Compile Include="Products\Wardrobe1Door.cs" />
+    <Compile Include="Products\Wardrobe2Doors.cs" />
+    <Compile Include="Products\Commode.cs" />
+    <Compile Include="Products\CookersOvenStove.cs" />
+    <Compile Include="Products\Dishwasher.cs" />
+    <Compile Include="Products\DoubleBedBase.cs" />
+    <Compile Include="Products\DoubleMattress.cs" />
+    <Compile Include="Products\Dryer.cs" />
+    <Compile Include="Products\DryerAboveWasher.cs" />
+    <Compile Include="Products\KingBedBase.cs" />
+    <Compile Include="Products\KingMattress.cs" />
+    <Compile Include="Products\FreezerLarge.cs" />
+    <Compile Include="Products\NightStand.cs" />
+    <Compile Include="Products\RefrigeratorLarge.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="IMoveDescription.cs" />
+    <Compile Include="IProduct.cs" />
+    <Compile Include="Products\FreezerMedium.cs" />
+    <Compile Include="Products\WardrobeBoxes4Provided.cs" />
+    <Compile Include="Products\YourBoxesApproximate.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Products\QueenBedBase.cs" />
+    <Compile Include="Products\QueenMattress.cs" />
+    <Compile Include="Products\Refrigerator.cs" />
+    <Compile Include="Products\SingleBedBase.cs" />
+    <Compile Include="Products\RefrigeratorSmall.cs" />
+    <Compile Include="Products\SingleMattressSmall.cs" />
+    <Compile Include="Products\Washer.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -79,5 +143,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

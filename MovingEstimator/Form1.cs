@@ -1,4 +1,5 @@
 ﻿using MovingEstimator.Languages;
+using MovingEstimator.Products;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,7 +49,6 @@ namespace MovingEstimator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int n_items = 0; // number of a specific item in the invetory
             reset();            // intializing elements
             if (Move_description.Text.Length > 2)
             {
@@ -70,10 +70,21 @@ namespace MovingEstimator
                     language = new English();
                 }
 
+                // Loop
+                int n_items = 0; // number of a specific item in the invetory
+                IProduct product = null;
+                string item_label;
+
                 string key, value;
                 string[] arr;
                 while (n_Line < s_Lines.Length)
                 {
+                    n_items = 0;
+                    item_label = "";
+                    product = null;
+
+                    key = "";
+                    value = "";
                     arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
                     if (arr.Length < 2)
                     {
@@ -91,7 +102,7 @@ namespace MovingEstimator
                         // add separator
                         s_client_name += ' ';
                     }
-                    if (key.Contains(language.Title()))
+                    else if (key.Contains(language.Title()))
                     {
                         //delete TITLE
                         string title_and_name = value;
@@ -99,17 +110,17 @@ namespace MovingEstimator
                         s_client_name = title_and_name;
 
                     }
-                    if (key.Contains(language.Email()))
+                    else if (key.Contains(language.Email()))
                     {
                         //delete E-MAIL
                         s_client_email = value;
                     }
-                    if (key.Contains(language.Phone()))
+                    else if (key.Contains(language.Phone()))
                     {
                         //delete PHONE
                         s_client_phn_number = value;
                     }
-                    if (key == language.MovingDate())
+                    else if (key == language.MovingDate())
                     {
                         //delete DATED
                         s_moving_date = value;
@@ -120,786 +131,561 @@ namespace MovingEstimator
                         monthCalendar2.SetDate(dt1);
                         monthCalendar3.SetDate(dt1);
                     }
-                    if (key.Contains(language.FlexibleDate()))
+                    else if (key.Contains(language.FlexibleDate()))
                     {
                         label_flexible_date.Text = value;
                     }
-                    if (key.Contains(language.DepartureAddressCity()))
+                    else if (key.Contains(language.DepartureAddressCity()))
                     {
                         //delete DEPARTURE ADDRESS + CITY
                         textBox_Starting_address.Text = value;
                     }
-                    if (key.Contains(language.DestinationAddressCity()))
+                    else if (key.Contains(language.DestinationAddressCity()))
                     {
                         //delete DESTINATION ADDRESS + CITY
                         textBox_Destination_address.Text = value;
                     }
-                    if (key.Contains(language.FloorDeparture()))
+                    else if (key.Contains(language.FloorDeparture()))
                     {
                         //FLOOR DEPARTURE ADDRESS
                         textBox_Starting_address_floor.Text = value;
                     }
-                    if (key.Contains(language.FloorDestination()))
+                    else if (key.Contains(language.FloorDestination()))
                     {
                         //delete FLOOR DESTINATION ADDRESS
                         textBox_Destination_address_floor.Text = value;
                     }
-                    if (key.Contains(language.Refrigerator()))
+                    else if (key.Contains(language.Refrigerator()))
                     {
                         if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
                         {
                             //REFRIGERATOR	1
                             n_items = int.Parse(value);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += "x " + language.Refrigerator() + "; ";
-                                dVolume += n_items;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.1;
-                            }
+                            product = new Refrigerator();
+
+                            item_label += n_items;
+                            item_label += "x " + language.Refrigerator() + "; ";
                         }
-                        if (key.Contains(language.Large()))
+                        else if (key.Contains(language.Large()))
                         {
                             //LARGE REFRIGERATOR	1 
                             n_items = int.Parse(value);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items; // number of LARGE REFRIGERATOR
-                                s_inventory += "x " + language.Large() + " " + language.Refrigerator() + "; ";
-                                dVolume += n_items * 1.3;
-                                dLoading_time += n_items * 0.2;
-                                dUnLoading_time += n_items * 0.15;
-                            }
+                            product = new RefrigeratorLarge();
+
+                            item_label += n_items; // number of LARGE REFRIGERATOR
+                            item_label += "x " + language.Large() + " " + language.Refrigerator() + "; ";
                         }
-                        if (key.Contains(language.Small()))
+                        else if (key.Contains(language.Small()))
                         {
                             //SMALL REFRIGERATOR	1
                             n_items = int.Parse(value);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += "x " + language.Small() + " " + language.Refrigerator() + "; ";
-                                dVolume += n_items * 0.5;
-                                dLoading_time += n_items * 0.15;
-                                dUnLoading_time += n_items * 0.1;
-                            }
+                            product = new RefrigeratorSmall();
+
+                            item_label += n_items;
+                            item_label += "x " + language.Small() + " " + language.Refrigerator() + "; ";
                         }
                     }// fridges
-                    if (key.Contains(language.LargeFreezer()))
+                    else if (key.Contains(language.LargeFreezer()))
                     {
                         //LARGE FREEZER   1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.LargeFreezer() + "; ";
+                        product = new FreezerLarge();
 
-                            dVolume += n_items;
-                            dLoading_time += n_items * 0.15;
-                            dUnLoading_time += n_items * 0.12;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.LargeFreezer() + "; ";
                     }
-                    if (key.Contains(language.MediumFreezer()))
+                    else if (key.Contains(language.MediumFreezer()))
                     {
                         //MEDIUM FREEZER   1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.MediumFreezer() + "; ";
+                        product = new FreezerMedium();
 
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.MediumFreezer() + "; ";
                     }
-                    if (key.Contains(language.CookersOvenStove()))
+                    else if (key.Contains(language.CookersOvenStove()))
                     {
                         //COOKERS - OVEN / STOVE    1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.CookersOvenStove() + "; ";
+                        product = new CookersOvenStove();
 
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.CookersOvenStove() + "; ";
                     }
-                    if (key.Contains(language.Dishwasher()))
+                    else if (key.Contains(language.Dishwasher()))
                     {
                         //DISHWASHER    1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Dishwasher() + "; ";
+                        product = new Dishwasher();
 
-                            dVolume += n_items * .4;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.07;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Dishwasher() + "; ";
                     }
-                    if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
+                    else if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
                     {
                         //DRYER    1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Dryer() + "; ";
+                        product = new Dryer();
 
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.07;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Dryer() + "; ";
                     }
-                    if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
+                    else if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
                     {
                         //WASHER    1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Washer() + "; ";
+                        product = new Washer();
 
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.07;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Washer() + "; ";
                     }
-                    if (key.Contains(language.DryerAboveWasher()))
+                    else if (key.Contains(language.DryerAboveWasher()))
                     {
-                        s_inventory += " " + language.DryerAboveWasher() + "; ";
-                        dLoading_time += 0.1;
-                        dUnLoading_time += 0.1;
+                        n_items = 1;
+
+                        item_label += " " + language.DryerAboveWasher() + "; ";
+                        product = new DryerAboveWasher();
                     }
-                    if (key.Contains(language.KingBedBase()))
+                    else if (key.Contains(language.KingBedBase()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.KingBedBase() + "; ";
+                        product = new KingBedBase();
 
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.2;
-                            dUnLoading_time += n_items * 0.13;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.KingBedBase() + "; ";
                     }
-                    if (key.Contains(language.QueenBedBase()))
+                    else if (key.Contains(language.QueenBedBase()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.QueenBedBase() + "; ";
+                        product = new QueenBedBase();
 
-                            dVolume += n_items * .3;
-                            dLoading_time += n_items * 0.11;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.QueenBedBase() + "; ";
                     }
-                    if (key.Contains(language.DoubleBedBase()))
+                    else if (key.Contains(language.DoubleBedBase()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.DoubleBedBase() + "; ";
+                        product = new DoubleBedBase();
 
-                            dVolume += n_items * .3;
-                            dLoading_time += n_items * 0.11;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.DoubleBedBase() + "; ";
                     }
-                    if (key.Contains(language.SingleBedBase()))
+                    else if (key.Contains(language.SingleBedBase()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.SingleBedBase() + "; ";
+                        product = new SingleBedBase();
 
-                            dVolume += n_items * .25;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.07;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.SingleBedBase() + "; ";
                     }
-                    if (key.Contains(language.KingMattress()))
+                    else if (key.Contains(language.KingMattress()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += 2 * n_items;
-                        if (n_items > 0)
-                        {
+                        product = new KingMattress();
 
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.KingMattress() + "; ";
-
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.15;
-                            dUnLoading_time += n_items * 0.05;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.KingMattress() + "; ";
                     }
-                    if (key.Contains(language.QueenMattress()))
+                    else if (key.Contains(language.QueenMattress()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
+                        product = new QueenMattress();
 
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.QueenMattress() + "; ";
-
-                            dVolume += n_items * .4;
-                            dLoading_time += n_items * 0.05;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.QueenMattress() + "; ";
                     }
-                    if (key.Contains(language.DoubleMattress()))
+                    else if (key.Contains(language.DoubleMattress()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
+                        product = new DoubleMattress();
 
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.DoubleMattress() + "; ";
-
-                            dVolume += n_items * .35;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.DoubleMattress() + "; ";
                     }
-                    if (key.Contains(language.SingleMattressSmall()))
+                    else if (key.Contains(language.SingleMattressSmall()))
                     {
                         //SINGLE MATTRESS (SMALL)
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.SingleMattressSmall() + "; ";
+                        product = new SingleMattressSmall();
 
-                            dVolume += n_items * .2;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.SingleMattressSmall() + "; ";
                     }
-                    if (key.Contains(language.BoxspringKing()))
+                    else if (key.Contains(language.BoxspringKing()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.BoxspringKing() + "; ";
-                            dVolume += n_items * .2;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        product = new BoxspringKing();
+
+                        item_label += n_items;
+                        item_label += " x " + language.BoxspringKing() + "; ";
                     }
-                    if (key.Contains(language.BoxspringSingle()))
+                    else if (key.Contains(language.BoxspringSingle()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.BoxspringSingle() + "; ";
-                            dVolume += n_items * .2;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        product = new BoxspringSingle();
+
+                        item_label += n_items;
+                        item_label += " x " + language.BoxspringSingle() + "; ";
                     }
-                    if (key.Contains(language.BoxspringQueen()))
+                    else if (key.Contains(language.BoxspringQueen()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.BoxspringQueen() + "; ";
-                            dVolume += n_items * .3;
-                            dLoading_time += n_items * 0.04;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        product = new BoxspringQueen();
+
+                        item_label += n_items;
+                        item_label += " x " + language.BoxspringQueen() + "; ";
                     }
-                    if (key.Contains(language.BoxspringDouble()))
+                    else if (key.Contains(language.BoxspringDouble()))
                     {
                         n_items = int.Parse(value);
                         nPlastic_bags += n_items;
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.BoxspringDouble() + "; ";
-                            dVolume += n_items * .25;
-                            dLoading_time += n_items * 0.04;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        product = new BoxspringDouble();
+
+                        item_label += n_items;
+                        item_label += " x " + language.BoxspringDouble() + "; ";
                     }
-                    if (key.Contains(language.Commode()))
+                    else if (key.Contains(language.Commode()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Commode() + "; ";
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        product = new Commode();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Commode() + "; ";
                     }
-                    if (key.Contains(language.Nightstand()))
+                    else if (key.Contains(language.Nightstand()))
                     {
                         //TABLE DE CHEVET 1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Nightstand() + "; ";
+                        product = new NightStand();
 
-                            dVolume += n_items * .3;
-                            dLoading_time += n_items * 0.07;
-                            dUnLoading_time += n_items * 0.05;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Nightstand() + "; ";
                     }
-                    if (key.Contains(language.Wardrobe2Doors()))
+                    else if (key.Contains(language.Wardrobe2Doors()))
                     {
                         //ARMOIRE(2 PORTES)  1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Wardrobe2Doors() + "; ";
-                            dVolume += n_items * .8;
-                            dLoading_time += n_items * 0.12;
-                            dUnLoading_time += n_items * 0.05;
-                        }
+                        product = new Wardrobe2Doors();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Wardrobe2Doors() + "; ";
                     }
-                    if (key.Contains(language.Wardrobe1Door()))
+                    else if (key.Contains(language.Wardrobe1Door()))
                     {
                         //WARDROBE (1 DOOR)  1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Wardrobe1Door() + "; ";
+                        product = new Wardrobe1Door();
 
-                            dVolume += n_items * .3;
-                            dLoading_time += n_items * 0.05;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Wardrobe1Door() + "; ";
                     }
-                    if (key.Contains(language.Cradle()))
+                    else if (key.Contains(language.Cradle()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Cradle() + "; ";
-                            dVolume += n_items * .4;
-                            dLoading_time += n_items * 0.08;
-                            dUnLoading_time += n_items * 0.05;
-                        }
-                    }
-                    if (key.Contains(language.Loveseat2SeaterSofa()))
-                    {
-                        n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Loveseat2SeaterSofa() + "; ";
+                        product = new Cradle();
 
-                            dVolume += n_items * 1.0;
-                            dLoading_time += n_items * 0.12;
-                            dUnLoading_time += n_items * 0.06;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Cradle() + "; ";
                     }
-                    if (key.Contains(language.Sofa3Seater()))
+                    else if (key.Contains(language.Loveseat2SeaterSofa()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Sofa3Seater() + "; ";
-                            dVolume += n_items * 1.3;
-                            dLoading_time += n_items * 0.15;
-                            dUnLoading_time += n_items * 0.10;
-                        }
+                        product = new Loveseat2SeaterSofa();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Loveseat2SeaterSofa() + "; ";
                     }
-                    if (key.Contains(language.Armchair()))
+                    else if (key.Contains(language.Sofa3Seater()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Armchair() + "; ";
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        product = new Sofa3Seater();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Sofa3Seater() + "; ";
+                    }
+                    else if (key.Contains(language.Armchair()))
+                    {
+                        n_items = int.Parse(value);
+                        product = new ArmChair();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Armchair() + "; ";
                     }
 
-                    if (key.Contains(language.TvStand()))
+                    else if (key.Contains(language.TvStand()))
                     {
                         if (key.Contains(language.Large()))
                         {
                             n_items = int.Parse(value);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.TvStand() + " (" + language.Large() + "); ";
-                                dVolume += n_items * 1.2;
-                                dLoading_time += n_items * 0.3;
-                                dUnLoading_time += n_items * 0.2;
-                            }
+                            product = new TVStandLarge();
+
+                            item_label += n_items;
+                            item_label += " x " + language.TvStand() + " (" + language.Large() + "); ";
                         }
-                        if (key.Contains(language.MediumSmall()))
+                        else if (key.Contains(language.MediumSmall()))
                         {
                             n_items = int.Parse(value);
-                            if (n_items > 0)
-                            {
-                                s_inventory += n_items;
-                                s_inventory += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
-                                dVolume += n_items * 0.4;
-                                dLoading_time += n_items * 0.1;
-                                dUnLoading_time += n_items * 0.05;
-                            }
+                            product = new TVStandMedium();
+
+                            item_label += n_items;
+                            item_label += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
                         }
                     }
-
-                    if (key.Contains(language.LargeTv()))
+                    else if (key.Contains(language.LargeTv()))
                     {// TÉLÉVISEUR(GRAND) 2
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.LargeTv() + ";  ";
-                            dVolume += n_items * 0.3;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.1;
-                        }
+                        product = new TVLarge();
+
+                        item_label += n_items;
+                        item_label += " x " + language.LargeTv() + "; ";
                     }
-                    if (key.Contains(language.MediumSmallTv()))
+                    else if (key.Contains(language.MediumSmallTv()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.MediumSmallTv() + ";  ";
-                            dVolume += n_items * 0.1;
-                            dLoading_time += n_items * 0.05;
-                            dUnLoading_time += n_items * 0.05;
-                        }
-                    }
+                        product = new TVSmall();
 
-                    if (key.Contains(language.CoffeeAndSideTables()))
+                        item_label += n_items;
+                        item_label += " x " + language.MediumSmallTv() + "; ";
+                    }
+                    else if (key.Contains(language.CoffeeAndSideTables()))
                     {//COFFEE AND SIDE TABLES  1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.CoffeeAndSideTables() + "; ";
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.05;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        product = new CoffeeAndSideTables();
+
+                        item_label += n_items;
+                        item_label += " x " + language.CoffeeAndSideTables() + "; ";
                     }
-                    if (key.Contains(language.DiningOrPatioTables()))
+                    else if (key.Contains(language.DiningOrPatioTables()))
                     {//DINING OR PATIO TABLES  1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.DiningOrPatioTables() + "; ";
+                        product = new DinningOrPatioTables();
 
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.15;
-                            dUnLoading_time += n_items * 0.05;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.DiningOrPatioTables() + "; ";
                     }
-                    if (key.Contains(language.Chairs()))
+                    else if (key.Contains(language.Chairs()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Chairs() + "; ";
-                            dVolume += n_items * .4;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        product = new Chairs();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Chairs() + "; ";
                     }
-                    if (key.Contains(language.Library()))
+                    else if (key.Contains(language.Library()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Library() + "; ";
-                            dVolume += n_items * .4;
-                            dLoading_time += n_items * 0.03;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        product = new Library();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Library() + "; ";
                     }
-                    if (key.Contains(language.DrawerFolderCabinet()))
+                    else if (key.Contains(language.DrawerFolderCabinet()))
                     {
                         //DRAWER FOLDER CABINET 1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.DrawerFolderCabinet() + "; ";
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.04;
-                            dUnLoading_time += n_items * 0.03;
-                        }
+                        product = new DrawerFolderCabinet();
+
+                        item_label += n_items;
+                        item_label += " x " + language.DrawerFolderCabinet() + "; ";
                     }
-                    if (key.Contains(language.DessertHucheCabinets()))
+                    else if (key.Contains(language.DessertHucheCabinets()))
                     {
                         //DESSERT, HUCHE, CABINETS  1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.DessertHucheCabinets() + "; ";
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.08;
-                        }
+                        product = new DessertHucheCabinets();
+
+                        item_label += n_items;
+                        item_label += " x " + language.DessertHucheCabinets() + "; ";
                     }
-                    if (key.Contains(language.MirrorsFrames()))
+                    else if (key.Contains(language.MirrorsFrames()))
                     {
                         //MIRRORS - FRAMES    2
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.MirrorsFrames() + "; ";
-                            dVolume += n_items * .1;
-                            dLoading_time += n_items * 0.02;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        product = new MirrorsFrames();
+
+                        item_label += n_items;
+                        item_label += " x " + language.MirrorsFrames() + "; ";
                     }
-                    if (key.Contains(language.LargeCarpet()))
+                    else if (key.Contains(language.LargeCarpet()))
                     {
                         //LARGE CARPET 1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.LargeCarpet() + "; ";
-                            dVolume += n_items * .1;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.1;
-                        }
+                        product = new CarpetLarge();
+
+                        item_label += n_items;
+                        item_label += " x " + language.LargeCarpet() + "; ";
                     }
-                    if (key.Contains(language.SmallMediumCarpet()))
+                    else if (key.Contains(language.SmallMediumCarpet()))
                     {
                         //LARGE CARPET 1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.SmallMediumCarpet() + "; ";
-                            dVolume += n_items * .1;
-                            dLoading_time += n_items * 0.02;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        product = new CarpetMedium();
+
+                        item_label += n_items;
+                        item_label += " x " + language.SmallMediumCarpet() + "; ";
                     }
-                    if (key.Contains(language.LampsAndLampShades()))
+                    else if (key.Contains(language.LampsAndLampShades()))
                     {
                         //LAMPE 1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.LampsAndLampShades() + "; ";
+                        product = new LampsAndLampShades();
 
-                            dVolume += n_items * .2;
-                            dLoading_time += n_items * 0.01;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.LampsAndLampShades() + "; ";
                     }
-                    if (key.Contains(language.Safe()))
+                    else if (key.Contains(language.Safe()))
                     {
                         if (key.Contains(language.SentenceSmall()))
                         {
-                            s_inventory += " Small SAFE; ";
-                            dVolume += .4;
-                            dLoading_time += 0.04;
-                            dUnLoading_time += 0.03;
+                            n_items = 1;
+
+                            item_label += " Small SAFE; ";
+                            product = new SafeSmall();;
                         }
-                        if (key.Contains(language.SentenceAverage()))
+                        else if (key.Contains(language.SentenceAverage()))
                         {
-                            s_inventory += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                            dVolume += .6;
-                            dLoading_time += 0.4;
-                            dUnLoading_time += 0.2;
+                            n_items = 1;
+
+                            item_label += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                            product = new SafeMedium();
                         }
-                        if (key.Contains(language.SentenceBig()))
+                        else if (key.Contains(language.SentenceBig()))
                         {
-                            s_inventory += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                            dVolume += 1.2;
-                            dLoading_time += 1.5;// 1 h exrtra
-                            dUnLoading_time += 0.5;
+                            n_items = 1;
+
+                            item_label += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                            product = new SafeLarge();
                         }
                     }
-                    if (key.Contains(language.Piano()))
+                    else if (key.Contains(language.Piano()))
                     {
                         if (key.Contains(language.SentenceSmall()))
                         {
-                            s_inventory += " SMALL PIANO; ";
-                            dVolume += .4;
-                            dLoading_time += 0.04;
-                            dUnLoading_time += 0.03;
+                            n_items = 1;
+
+                            item_label += " Small PIANO; ";
+                            product = new PianoSmall();
                         }
-                        if (key.Contains(language.SentenceAverage()))
+                        else if (key.Contains(language.SentenceAverage()))
                         {
-                            s_inventory += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
-                            dVolume += .6;
-                            dLoading_time += 0.4;
-                            dUnLoading_time += 0.2;
+                            n_items = 1;
+
+                            item_label += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
+                            product = new PianoMedium();
                         }
-                        if (key.Contains(language.SentenceBig()))
+                        else if (key.Contains(language.SentenceBig()))
                         {
-                            s_inventory += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
-                            dVolume += 1.2;
-                            dLoading_time += 1.5;// 1 h exrtra
-                            dUnLoading_time += .5;
+                            n_items = 1;
+
+                            item_label += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
+                            product = new PianoLarge();
                         }
                     }
-                    if (key.Contains(language.Barbecue()))
+                    else if (key.Contains(language.Barbecue()))
                     {
                         //BARBECUE	2
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Barbecue() + "; ";
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * 0.04;
-                            dUnLoading_time += n_items * 0.04;
-                        }
+                        product = new Barbecue();
+
+                        item_label += n_items;
+                        item_label += " x " + language.Barbecue() + "; ";
                     }
-                    if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
+                    else if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
                     {
                         //VÉLO	1
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Bike() + "; ";
+                        product = new Bike();
 
-                            dVolume += n_items * .5;
-                            dLoading_time += n_items * 0.02;
-                            dUnLoading_time += n_items * 0.02;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Bike() + "; ";
                     }
-                    if (key.Contains(language.Suitcases()))
+                    else if (key.Contains(language.Suitcases()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Suitcases() + "; ";
+                        product = new Suitcases();
 
-                            dVolume += n_items * .2;
-                            dLoading_time += n_items * 0.01;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Suitcases() + "; ";
                     }
-                    if (key.Contains(language.Tires()))
+                    else if (key.Contains(language.Tires()))
                     {
                         //PNEUS   13
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Tires() + "; ";
+                        product = new Tires();
 
-                            dVolume += n_items * .15;
-                            dLoading_time += n_items * 0.01;
-                            dUnLoading_time += n_items * 0.01;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Tires() + "; ";
                     }
-                    if (key.Contains(language.Treadmill()))
+                    else if (key.Contains(language.Treadmill()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.Treadmill() + "; ";
-                            dVolume += n_items * .8;
-                            dLoading_time += n_items * 0.15;
-                            dUnLoading_time += n_items * 0.15;
-                        }
-                    }
-                    if (key.Contains(language.StationaryBikes()))
-                    {
-                        n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.StationaryBikes() + "; ";
-                            dVolume += n_items;
-                            dLoading_time += n_items * 0.1;
-                            dUnLoading_time += n_items * 0.1;
-                        }
-                    }
-                    if (key.Contains(language.PoolTable()))
-                    {
-                        n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += "\n---- " + n_items + " x " + language.PoolTable() + "; ----\n";
+                        product = new Treadmill();
 
-                            dVolume += n_items * 15;
-                            dLoading_time += n_items * 3;
-                            dUnLoading_time += n_items * 3;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.Treadmill() + "; ";
                     }
-                    if (key.Contains(language.YourBoxesApproximate()))
+                    else if (key.Contains(language.StationaryBikes()))
                     {
                         n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            s_inventory += " x " + language.YourBoxesApproximate() + ";";
-                            dVolume += n_items * .15;
-                            dLoading_time += n_items * .015;
-                            dUnLoading_time += n_items * .01;
-                        }
-                    }
-                    if (key.Contains(language.WardrobeBoxes4Provided()))
-                    {
-                        n_items = int.Parse(value);
-                        if (n_items > 0)
-                        {
-                            s_inventory += n_items;
-                            nWardrobe_boxes += n_items;
-                            s_inventory += " x " + language.WardrobeBoxes4Provided() + ";";
+                        product = new StationaryBikes();
 
-                            dVolume += n_items * .6;
-                            dLoading_time += n_items * .075;
-                            dUnLoading_time += n_items * .03;
-                        }
+                        item_label += n_items;
+                        item_label += " x " + language.StationaryBikes() + "; ";
                     }
-                    if (key.Contains(language.MoreDetails()))
+                    else if (key.Contains(language.PoolTable()))
+                    {
+                        n_items = int.Parse(value);
+                        product = new PoolTable();
+
+                        item_label += n_items;
+                        item_label += " x " + language.PoolTable() + "; ";
+                    }
+                    else if (key.Contains(language.YourBoxesApproximate()))
+                    {
+                        n_items = int.Parse(value);
+                        product = new YourBoxesApproximate();
+
+                        item_label += n_items;
+                        item_label += " x " + language.YourBoxesApproximate() + "; ";
+                    }
+                    else if (key.Contains(language.WardrobeBoxes4Provided()))
+                    {
+                        n_items = int.Parse(value);
+                        product = new WardrobeBoxes4Provided();
+
+                        item_label += n_items;
+                        item_label += " x " + language.WardrobeBoxes4Provided() + "; ";
+                    }
+                    else if (key.Contains(language.MoreDetails()))
                     {
                         //PLUS DE PRÉCISIONS rien pour l\'instant
                         s_notes += "\n" + language.MoreDetails() + ": ";
                         s_notes += value;
                     }
-                    if (key.Contains(language.HowDidYouHearAboutUs()))
+                    else if (key.Contains(language.HowDidYouHearAboutUs()))
                     {
                         s_notes += '\n' + value;
                         textBox_Destination_source.Text = value;
                     }
 
+                    // TODO: Calcualte
+                    if (n_items > 0)
+                    {
+                        s_inventory += item_label;
+
+                        dVolume += product.Volume() * n_items;
+                        dLoading_time += product.Loading() * n_items;
+                        dUnLoading_time += product.Unloading() * n_items;
+                    }
+
+                    // TODO: Next loop
                     n_Line++;
                     n_items = 0;
                 }
