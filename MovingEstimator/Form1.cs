@@ -1940,18 +1940,16 @@ namespace MovingEstimator
             return quarter_round(h * .75);
         }
         private double quarter_round(double q)
-        //{    // round to either 0 .25 .5 .75 
+        {
+            double nearestInt = Math.Truncate(q);
+            double fractionalPart = q - nearestInt;
 
-        //    double dbuffer = Math.Round(q, 2, MidpointRounding.AwayFromZero) // round to 2 digits after comma
-        //        - Math.Round(q, 0, MidpointRounding.ToZero); // nearest int
-        //                                                     //now dbuffer contains the fractional part of q 
+            if (fractionalPart < 0.125) return nearestInt;
+            if (fractionalPart < 0.375) return nearestInt + 0.25;
+            if (fractionalPart < 0.625) return nearestInt + 0.5;
+            if (fractionalPart < 0.875) return nearestInt + 0.75;
 
-        //    if (dbuffer < .10) return Math.Round(q, 0, MidpointRounding.ToZero);
-        //    if (dbuffer < .30) return Math.Round(q, 0, MidpointRounding.ToZero) + .25;
-        //    if (dbuffer < .60) return Math.Round(q, 0, MidpointRounding.ToZero) + .5;
-        //    if (dbuffer < .80) return Math.Round(q, 0, MidpointRounding.ToZero) + .75;
-
-        //    return Math.Round(q, 0, MidpointRounding.AwayFromZero);
+            return nearestInt + 1.0;
         }
 
 
