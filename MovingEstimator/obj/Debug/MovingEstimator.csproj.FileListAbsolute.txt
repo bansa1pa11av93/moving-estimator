@@ -1,0 +1,10 @@
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.csproj.AssemblyReference.cache
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.Properties.Resources.resources
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.csproj.GenerateResource.cache
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.csproj.CoreCompileInputs.cache
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\bin\Debug\MovingEstimator.exe.config
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\bin\Debug\MovingEstimator.exe
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\bin\Debug\MovingEstimator.pdb
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.exe
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.pdb
+C:\Workspace\Freelancer\MovingEstimator\MovingEstimator\obj\Debug\MovingEstimator.Form1.resources

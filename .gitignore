@@ -1,0 +1,49 @@
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User-specific files
+*.rsuser
+*.rsbak
+*.pidb
+
+# Auto-generated files
+*.obj
+*.log
+*.tlog
+*.lastbuildstate
+.builds
+*.opensdf
+*.sdf
+*.cache
+*.pdb
+*.opendb
+
+# Visual Studio Code directories
+.vscode/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# NPM packages
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Dotenv environment variables file
+.env
