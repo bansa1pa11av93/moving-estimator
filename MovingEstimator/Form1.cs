@@ -49,723 +49,733 @@ namespace MovingEstimator
 
         private void button1_Click(object sender, EventArgs e)
         {
-            reset();            // intializing elements
-            if (Move_description.Text.Length > 2)
+            reset(); // intializing elements
+            if (Move_description.Text.Length <= 2)
             {
-                const string GEnglishToDetect = "STEP 1 - CUSTOMER INFORMATION";
-                const string GFrenchToDetect = "ÉTAPE 1 - INFORMATIONS CLIENT";
-                ILanguage language = null;
+                Move_description.Text += "Analyse completed...";
+                return;
+            }
 
-                // divides text into lines
-                string[] s_Lines = Move_description.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
-                int n_Line = 0;
-  
-                // Choose language
-                if (Move_description.Text.Contains(GFrenchToDetect))
+
+            handleBussinessLogicAnalyseMove();
+            updateUIWhenAnalyseMoveCompleted();
+        }
+
+        private void handleBussinessLogicAnalyseMove()
+        {
+            const string GEnglishToDetect = "STEP 1 - CUSTOMER INFORMATION";
+            const string GFrenchToDetect = "ÉTAPE 1 - INFORMATIONS CLIENT";
+            ILanguage language = null;
+
+            // divides text into lines
+            string[] s_Lines = Move_description.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
+            int n_Line = 0;
+
+            // Choose language
+            if (Move_description.Text.Contains(GFrenchToDetect))
+            {
+                language = new French();
+            }
+            else if (Move_description.Text.Contains(GEnglishToDetect))
+            {
+                language = new English();
+            }
+
+            // Loop
+            int n_items = 0; // number of a specific item in the invetory
+            IProduct product = null;
+            string item_label;
+
+            string key, value;
+            string[] arr;
+            while (n_Line < s_Lines.Length)
+            {
+                n_items = 0;
+                item_label = "";
+                product = null;
+
+                key = "";
+                value = "";
+                arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
+                if (arr.Length < 2)
                 {
-                    language = new French();
+                    ++n_Line;
+                    continue;
                 }
-                else if (Move_description.Text.Contains(GEnglishToDetect))
+
+                key = arr[0].Trim();
+                value = arr[1].Trim();
+
+                if (key.Contains(language.LegalName()))
                 {
-                    language = new English();
+                    // delete FIRST NAME
+                    s_client_name += value;
+                    // add separator
+                    s_client_name += ' ';
+                }
+                else if (key.Contains(language.Title()))
+                {
+                    //delete TITLE
+                    string title_and_name = value;
+                    title_and_name += " " + s_client_name;
+                    s_client_name = title_and_name;
+
+                }
+                else if (key.Contains(language.Email()))
+                {
+                    //delete E-MAIL
+                    s_client_email = value;
+                }
+                else if (key.Contains(language.Phone()))
+                {
+                    //delete PHONE
+                    s_client_phn_number = value;
+                }
+                else if (key == language.MovingDate())
+                {
+                    //delete DATED
+                    s_moving_date = value;
+                    label_flexible_date.Text = s_moving_date;
+                    DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
+
+                    monthCalendar1.SetDate(dt1);
+                    monthCalendar2.SetDate(dt1);
+                    monthCalendar3.SetDate(dt1);
+                }
+                else if (key.Contains(language.FlexibleDate()))
+                {
+                    label_flexible_date.Text = value;
+                }
+                else if (key.Contains(language.DepartureAddressCity()))
+                {
+                    //delete DEPARTURE ADDRESS + CITY
+                    textBox_Starting_address.Text = value;
+                }
+                else if (key.Contains(language.DestinationAddressCity()))
+                {
+                    //delete DESTINATION ADDRESS + CITY
+                    textBox_Destination_address.Text = value;
+                }
+                else if (key.Contains(language.FloorDeparture()))
+                {
+                    //FLOOR DEPARTURE ADDRESS
+                    textBox_Starting_address_floor.Text = value;
+                }
+                else if (key.Contains(language.FloorDestination()))
+                {
+                    //delete FLOOR DESTINATION ADDRESS
+                    textBox_Destination_address_floor.Text = value;
+                }
+                else if (key.Contains(language.Refrigerator()))
+                {
+                    if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
+                    {
+                        //REFRIGERATOR	1
+                        n_items = int.Parse(value);
+                        product = new Refrigerator();
+
+                        item_label += n_items;
+                        item_label += "x " + language.Refrigerator() + "; ";
+                    }
+                    else if (key.Contains(language.Large()))
+                    {
+                        //LARGE REFRIGERATOR	1 
+                        n_items = int.Parse(value);
+                        product = new RefrigeratorLarge();
+
+                        item_label += n_items; // number of LARGE REFRIGERATOR
+                        item_label += "x " + language.Large() + " " + language.Refrigerator() + "; ";
+                    }
+                    else if (key.Contains(language.Small()))
+                    {
+                        //SMALL REFRIGERATOR	1
+                        n_items = int.Parse(value);
+                        product = new RefrigeratorSmall();
+
+                        item_label += n_items;
+                        item_label += "x " + language.Small() + " " + language.Refrigerator() + "; ";
+                    }
+                }// fridges
+                else if (key.Contains(language.LargeFreezer()))
+                {
+                    //LARGE FREEZER   1
+                    n_items = int.Parse(value);
+                    product = new FreezerLarge();
+
+                    item_label += n_items;
+                    item_label += " x " + language.LargeFreezer() + "; ";
+                }
+                else if (key.Contains(language.MediumFreezer()))
+                {
+                    //MEDIUM FREEZER   1
+                    n_items = int.Parse(value);
+                    product = new FreezerMedium();
+
+                    item_label += n_items;
+                    item_label += " x " + language.MediumFreezer() + "; ";
+                }
+                else if (key.Contains(language.CookersOvenStove()))
+                {
+                    //COOKERS - OVEN / STOVE    1
+                    n_items = int.Parse(value);
+                    product = new CookersOvenStove();
+
+                    item_label += n_items;
+                    item_label += " x " + language.CookersOvenStove() + "; ";
+                }
+                else if (key.Contains(language.Dishwasher()))
+                {
+                    //DISHWASHER    1
+                    n_items = int.Parse(value);
+                    product = new Dishwasher();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Dishwasher() + "; ";
+                }
+                else if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
+                {
+                    //DRYER    1
+                    n_items = int.Parse(value);
+                    product = new Dryer();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Dryer() + "; ";
+                }
+                else if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
+                {
+                    //WASHER    1
+                    n_items = int.Parse(value);
+                    product = new Washer();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Washer() + "; ";
+                }
+                else if (key.Contains(language.DryerAboveWasher()))
+                {
+                    n_items = 1;
+
+                    item_label += " " + language.DryerAboveWasher() + "; ";
+                    product = new DryerAboveWasher();
+                }
+                else if (key.Contains(language.KingBedBase()))
+                {
+                    n_items = int.Parse(value);
+                    product = new KingBedBase();
+
+                    item_label += n_items;
+                    item_label += " x " + language.KingBedBase() + "; ";
+                }
+                else if (key.Contains(language.QueenBedBase()))
+                {
+                    n_items = int.Parse(value);
+                    product = new QueenBedBase();
+
+                    item_label += n_items;
+                    item_label += " x " + language.QueenBedBase() + "; ";
+                }
+                else if (key.Contains(language.DoubleBedBase()))
+                {
+                    n_items = int.Parse(value);
+                    product = new DoubleBedBase();
+
+                    item_label += n_items;
+                    item_label += " x " + language.DoubleBedBase() + "; ";
+                }
+                else if (key.Contains(language.SingleBedBase()))
+                {
+                    n_items = int.Parse(value);
+                    product = new SingleBedBase();
+
+                    item_label += n_items;
+                    item_label += " x " + language.SingleBedBase() + "; ";
+                }
+                else if (key.Contains(language.KingMattress()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += 2 * n_items;
+                    product = new KingMattress();
+
+                    item_label += n_items;
+                    item_label += " x " + language.KingMattress() + "; ";
+                }
+                else if (key.Contains(language.QueenMattress()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new QueenMattress();
+
+                    item_label += n_items;
+                    item_label += " x " + language.QueenMattress() + "; ";
+                }
+                else if (key.Contains(language.DoubleMattress()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new DoubleMattress();
+
+                    item_label += n_items;
+                    item_label += " x " + language.DoubleMattress() + "; ";
+                }
+                else if (key.Contains(language.SingleMattressSmall()))
+                {
+                    //SINGLE MATTRESS (SMALL)
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new SingleMattressSmall();
+
+                    item_label += n_items;
+                    item_label += " x " + language.SingleMattressSmall() + "; ";
+                }
+                else if (key.Contains(language.BoxspringKing()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new BoxspringKing();
+
+                    item_label += n_items;
+                    item_label += " x " + language.BoxspringKing() + "; ";
+                }
+                else if (key.Contains(language.BoxspringSingle()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new BoxspringSingle();
+
+                    item_label += n_items;
+                    item_label += " x " + language.BoxspringSingle() + "; ";
+                }
+                else if (key.Contains(language.BoxspringQueen()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new BoxspringQueen();
+
+                    item_label += n_items;
+                    item_label += " x " + language.BoxspringQueen() + "; ";
+                }
+                else if (key.Contains(language.BoxspringDouble()))
+                {
+                    n_items = int.Parse(value);
+                    nPlastic_bags += n_items;
+                    product = new BoxspringDouble();
+
+                    item_label += n_items;
+                    item_label += " x " + language.BoxspringDouble() + "; ";
+                }
+                else if (key.Contains(language.Commode()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Commode();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Commode() + "; ";
+                }
+                else if (key.Contains(language.Nightstand()))
+                {
+                    //TABLE DE CHEVET 1
+                    n_items = int.Parse(value);
+                    product = new NightStand();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Nightstand() + "; ";
+                }
+                else if (key.Contains(language.Wardrobe2Doors()))
+                {
+                    //ARMOIRE(2 PORTES)  1
+                    n_items = int.Parse(value);
+                    product = new Wardrobe2Doors();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Wardrobe2Doors() + "; ";
+                }
+                else if (key.Contains(language.Wardrobe1Door()))
+                {
+                    //WARDROBE (1 DOOR)  1
+                    n_items = int.Parse(value);
+                    product = new Wardrobe1Door();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Wardrobe1Door() + "; ";
+                }
+                else if (key.Contains(language.Cradle()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Cradle();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Cradle() + "; ";
+                }
+                else if (key.Contains(language.Loveseat2SeaterSofa()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Loveseat2SeaterSofa();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Loveseat2SeaterSofa() + "; ";
+                }
+                else if (key.Contains(language.Sofa3Seater()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Sofa3Seater();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Sofa3Seater() + "; ";
+                }
+                else if (key.Contains(language.Armchair()))
+                {
+                    n_items = int.Parse(value);
+                    product = new ArmChair();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Armchair() + "; ";
                 }
 
-                // Loop
-                int n_items = 0; // number of a specific item in the invetory
-                IProduct product = null;
-                string item_label;
-
-                string key, value;
-                string[] arr;
-                while (n_Line < s_Lines.Length)
+                else if (key.Contains(language.TvStand()))
                 {
-                    n_items = 0;
-                    item_label = "";
-                    product = null;
-
-                    key = "";
-                    value = "";
-                    arr = s_Lines[n_Line].Split(new string[] { "\n" }, StringSplitOptions.None);
-                    if (arr.Length < 2)
+                    if (key.Contains(language.Large()))
                     {
-                        ++n_Line;
-                        continue;
-                    }
-
-                    key = arr[0].Trim();
-                    value = arr[1].Trim();
-
-                    if (key.Contains(language.LegalName()))
-                    {
-                        // delete FIRST NAME
-                        s_client_name += value;
-                        // add separator
-                        s_client_name += ' ';
-                    }
-                    else if (key.Contains(language.Title()))
-                    {
-                        //delete TITLE
-                        string title_and_name = value;
-                        title_and_name += " " + s_client_name;
-                        s_client_name = title_and_name;
-
-                    }
-                    else if (key.Contains(language.Email()))
-                    {
-                        //delete E-MAIL
-                        s_client_email = value;
-                    }
-                    else if (key.Contains(language.Phone()))
-                    {
-                        //delete PHONE
-                        s_client_phn_number = value;
-                    }
-                    else if (key == language.MovingDate())
-                    {
-                        //delete DATED
-                        s_moving_date = value;
-                        label_flexible_date.Text = s_moving_date;
-                        DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
-
-                        monthCalendar1.SetDate(dt1);
-                        monthCalendar2.SetDate(dt1);
-                        monthCalendar3.SetDate(dt1);
-                    }
-                    else if (key.Contains(language.FlexibleDate()))
-                    {
-                        label_flexible_date.Text = value;
-                    }
-                    else if (key.Contains(language.DepartureAddressCity()))
-                    {
-                        //delete DEPARTURE ADDRESS + CITY
-                        textBox_Starting_address.Text = value;
-                    }
-                    else if (key.Contains(language.DestinationAddressCity()))
-                    {
-                        //delete DESTINATION ADDRESS + CITY
-                        textBox_Destination_address.Text = value;
-                    }
-                    else if (key.Contains(language.FloorDeparture()))
-                    {
-                        //FLOOR DEPARTURE ADDRESS
-                        textBox_Starting_address_floor.Text = value;
-                    }
-                    else if (key.Contains(language.FloorDestination()))
-                    {
-                        //delete FLOOR DESTINATION ADDRESS
-                        textBox_Destination_address_floor.Text = value;
-                    }
-                    else if (key.Contains(language.Refrigerator()))
-                    {
-                        if (!key.Contains(language.Small()) && !key.Contains(language.Large()))// both previous ifs were false
-                        {
-                            //REFRIGERATOR	1
-                            n_items = int.Parse(value);
-                            product = new Refrigerator();
-
-                            item_label += n_items;
-                            item_label += "x " + language.Refrigerator() + "; ";
-                        }
-                        else if (key.Contains(language.Large()))
-                        {
-                            //LARGE REFRIGERATOR	1 
-                            n_items = int.Parse(value);
-                            product = new RefrigeratorLarge();
-
-                            item_label += n_items; // number of LARGE REFRIGERATOR
-                            item_label += "x " + language.Large() + " " + language.Refrigerator() + "; ";
-                        }
-                        else if (key.Contains(language.Small()))
-                        {
-                            //SMALL REFRIGERATOR	1
-                            n_items = int.Parse(value);
-                            product = new RefrigeratorSmall();
-
-                            item_label += n_items;
-                            item_label += "x " + language.Small() + " " + language.Refrigerator() + "; ";
-                        }
-                    }// fridges
-                    else if (key.Contains(language.LargeFreezer()))
-                    {
-                        //LARGE FREEZER   1
                         n_items = int.Parse(value);
-                        product = new FreezerLarge();
+                        product = new TVStandLarge();
 
                         item_label += n_items;
-                        item_label += " x " + language.LargeFreezer() + "; ";
+                        item_label += " x " + language.TvStand() + " (" + language.Large() + "); ";
                     }
-                    else if (key.Contains(language.MediumFreezer()))
+                    else if (key.Contains(language.MediumSmall()))
                     {
-                        //MEDIUM FREEZER   1
                         n_items = int.Parse(value);
-                        product = new FreezerMedium();
+                        product = new TVStandMedium();
 
                         item_label += n_items;
-                        item_label += " x " + language.MediumFreezer() + "; ";
+                        item_label += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
                     }
-                    else if (key.Contains(language.CookersOvenStove()))
-                    {
-                        //COOKERS - OVEN / STOVE    1
-                        n_items = int.Parse(value);
-                        product = new CookersOvenStove();
+                }
+                else if (key.Contains(language.LargeTv()))
+                {// TÉLÉVISEUR(GRAND) 2
+                    n_items = int.Parse(value);
+                    product = new TVLarge();
 
-                        item_label += n_items;
-                        item_label += " x " + language.CookersOvenStove() + "; ";
-                    }
-                    else if (key.Contains(language.Dishwasher()))
-                    {
-                        //DISHWASHER    1
-                        n_items = int.Parse(value);
-                        product = new Dishwasher();
+                    item_label += n_items;
+                    item_label += " x " + language.LargeTv() + "; ";
+                }
+                else if (key.Contains(language.MediumSmallTv()))
+                {
+                    n_items = int.Parse(value);
+                    product = new TVSmall();
 
-                        item_label += n_items;
-                        item_label += " x " + language.Dishwasher() + "; ";
-                    }
-                    else if (key.Contains(language.Dryer()) && !key.Contains(language.StackedWasherDryer()))
-                    {
-                        //DRYER    1
-                        n_items = int.Parse(value);
-                        product = new Dryer();
+                    item_label += n_items;
+                    item_label += " x " + language.MediumSmallTv() + "; ";
+                }
+                else if (key.Contains(language.CoffeeAndSideTables()))
+                {//COFFEE AND SIDE TABLES  1
+                    n_items = int.Parse(value);
+                    product = new CoffeeAndSideTables();
 
-                        item_label += n_items;
-                        item_label += " x " + language.Dryer() + "; ";
-                    }
-                    else if (key.Contains(language.Washer()) && !key.Contains(language.StackedWasherDryer()))
-                    {
-                        //WASHER    1
-                        n_items = int.Parse(value);
-                        product = new Washer();
+                    item_label += n_items;
+                    item_label += " x " + language.CoffeeAndSideTables() + "; ";
+                }
+                else if (key.Contains(language.DiningOrPatioTables()))
+                {//DINING OR PATIO TABLES  1
+                    n_items = int.Parse(value);
+                    product = new DinningOrPatioTables();
 
-                        item_label += n_items;
-                        item_label += " x " + language.Washer() + "; ";
-                    }
-                    else if (key.Contains(language.DryerAboveWasher()))
+                    item_label += n_items;
+                    item_label += " x " + language.DiningOrPatioTables() + "; ";
+                }
+                else if (key.Contains(language.Chairs()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Chairs();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Chairs() + "; ";
+                }
+                else if (key.Contains(language.Library()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Library();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Library() + "; ";
+                }
+                else if (key.Contains(language.DrawerFolderCabinet()))
+                {
+                    //DRAWER FOLDER CABINET 1
+                    n_items = int.Parse(value);
+                    product = new DrawerFolderCabinet();
+
+                    item_label += n_items;
+                    item_label += " x " + language.DrawerFolderCabinet() + "; ";
+                }
+                else if (key.Contains(language.DessertHucheCabinets()))
+                {
+                    //DESSERT, HUCHE, CABINETS  1
+                    n_items = int.Parse(value);
+                    product = new DessertHucheCabinets();
+
+                    item_label += n_items;
+                    item_label += " x " + language.DessertHucheCabinets() + "; ";
+                }
+                else if (key.Contains(language.MirrorsFrames()))
+                {
+                    //MIRRORS - FRAMES    2
+                    n_items = int.Parse(value);
+                    product = new MirrorsFrames();
+
+                    item_label += n_items;
+                    item_label += " x " + language.MirrorsFrames() + "; ";
+                }
+                else if (key.Contains(language.LargeCarpet()))
+                {
+                    //LARGE CARPET 1
+                    n_items = int.Parse(value);
+                    product = new CarpetLarge();
+
+                    item_label += n_items;
+                    item_label += " x " + language.LargeCarpet() + "; ";
+                }
+                else if (key.Contains(language.SmallMediumCarpet()))
+                {
+                    //LARGE CARPET 1
+                    n_items = int.Parse(value);
+                    product = new CarpetMedium();
+
+                    item_label += n_items;
+                    item_label += " x " + language.SmallMediumCarpet() + "; ";
+                }
+                else if (key.Contains(language.LampsAndLampShades()))
+                {
+                    //LAMPE 1
+                    n_items = int.Parse(value);
+                    product = new LampsAndLampShades();
+
+                    item_label += n_items;
+                    item_label += " x " + language.LampsAndLampShades() + "; ";
+                }
+                else if (key.Contains(language.Safe()))
+                {
+                    if (key.Contains(language.SentenceSmall()))
                     {
                         n_items = 1;
 
-                        item_label += " " + language.DryerAboveWasher() + "; ";
-                        product = new DryerAboveWasher();
+                        item_label += " Small SAFE; ";
+                        product = new SafeSmall(); ;
                     }
-                    else if (key.Contains(language.KingBedBase()))
+                    else if (key.Contains(language.SentenceAverage()))
                     {
-                        n_items = int.Parse(value);
-                        product = new KingBedBase();
+                        n_items = 1;
 
-                        item_label += n_items;
-                        item_label += " x " + language.KingBedBase() + "; ";
+                        item_label += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                        product = new SafeMedium();
                     }
-                    else if (key.Contains(language.QueenBedBase()))
+                    else if (key.Contains(language.SentenceBig()))
                     {
-                        n_items = int.Parse(value);
-                        product = new QueenBedBase();
+                        n_items = 1;
 
-                        item_label += n_items;
-                        item_label += " x " + language.QueenBedBase() + "; ";
+                        item_label += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
+                        product = new SafeLarge();
                     }
-                    else if (key.Contains(language.DoubleBedBase()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new DoubleBedBase();
-
-                        item_label += n_items;
-                        item_label += " x " + language.DoubleBedBase() + "; ";
-                    }
-                    else if (key.Contains(language.SingleBedBase()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new SingleBedBase();
-
-                        item_label += n_items;
-                        item_label += " x " + language.SingleBedBase() + "; ";
-                    }
-                    else if (key.Contains(language.KingMattress()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += 2 * n_items;
-                        product = new KingMattress();
-
-                        item_label += n_items;
-                        item_label += " x " + language.KingMattress() + "; ";
-                    }
-                    else if (key.Contains(language.QueenMattress()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new QueenMattress();
-
-                        item_label += n_items;
-                        item_label += " x " + language.QueenMattress() + "; ";
-                    }
-                    else if (key.Contains(language.DoubleMattress()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new DoubleMattress();
-
-                        item_label += n_items;
-                        item_label += " x " + language.DoubleMattress() + "; ";
-                    }
-                    else if (key.Contains(language.SingleMattressSmall()))
-                    {
-                        //SINGLE MATTRESS (SMALL)
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new SingleMattressSmall();
-
-                        item_label += n_items;
-                        item_label += " x " + language.SingleMattressSmall() + "; ";
-                    }
-                    else if (key.Contains(language.BoxspringKing()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new BoxspringKing();
-
-                        item_label += n_items;
-                        item_label += " x " + language.BoxspringKing() + "; ";
-                    }
-                    else if (key.Contains(language.BoxspringSingle()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new BoxspringSingle();
-
-                        item_label += n_items;
-                        item_label += " x " + language.BoxspringSingle() + "; ";
-                    }
-                    else if (key.Contains(language.BoxspringQueen()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new BoxspringQueen();
-
-                        item_label += n_items;
-                        item_label += " x " + language.BoxspringQueen() + "; ";
-                    }
-                    else if (key.Contains(language.BoxspringDouble()))
-                    {
-                        n_items = int.Parse(value);
-                        nPlastic_bags += n_items;
-                        product = new BoxspringDouble();
-
-                        item_label += n_items;
-                        item_label += " x " + language.BoxspringDouble() + "; ";
-                    }
-                    else if (key.Contains(language.Commode()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Commode();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Commode() + "; ";
-                    }
-                    else if (key.Contains(language.Nightstand()))
-                    {
-                        //TABLE DE CHEVET 1
-                        n_items = int.Parse(value);
-                        product = new NightStand();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Nightstand() + "; ";
-                    }
-                    else if (key.Contains(language.Wardrobe2Doors()))
-                    {
-                        //ARMOIRE(2 PORTES)  1
-                        n_items = int.Parse(value);
-                        product = new Wardrobe2Doors();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Wardrobe2Doors() + "; ";
-                    }
-                    else if (key.Contains(language.Wardrobe1Door()))
-                    {
-                        //WARDROBE (1 DOOR)  1
-                        n_items = int.Parse(value);
-                        product = new Wardrobe1Door();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Wardrobe1Door() + "; ";
-                    }
-                    else if (key.Contains(language.Cradle()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Cradle();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Cradle() + "; ";
-                    }
-                    else if (key.Contains(language.Loveseat2SeaterSofa()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Loveseat2SeaterSofa();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Loveseat2SeaterSofa() + "; ";
-                    }
-                    else if (key.Contains(language.Sofa3Seater()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Sofa3Seater();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Sofa3Seater() + "; ";
-                    }
-                    else if (key.Contains(language.Armchair()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new ArmChair();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Armchair() + "; ";
-                    }
-
-                    else if (key.Contains(language.TvStand()))
-                    {
-                        if (key.Contains(language.Large()))
-                        {
-                            n_items = int.Parse(value);
-                            product = new TVStandLarge();
-
-                            item_label += n_items;
-                            item_label += " x " + language.TvStand() + " (" + language.Large() + "); ";
-                        }
-                        else if (key.Contains(language.MediumSmall()))
-                        {
-                            n_items = int.Parse(value);
-                            product = new TVStandMedium();
-
-                            item_label += n_items;
-                            item_label += " x " + language.TvStand() + " (" + language.MediumSmall() + "); ";
-                        }
-                    }
-                    else if (key.Contains(language.LargeTv()))
-                    {// TÉLÉVISEUR(GRAND) 2
-                        n_items = int.Parse(value);
-                        product = new TVLarge();
-
-                        item_label += n_items;
-                        item_label += " x " + language.LargeTv() + "; ";
-                    }
-                    else if (key.Contains(language.MediumSmallTv()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new TVSmall();
-
-                        item_label += n_items;
-                        item_label += " x " + language.MediumSmallTv() + "; ";
-                    }
-                    else if (key.Contains(language.CoffeeAndSideTables()))
-                    {//COFFEE AND SIDE TABLES  1
-                        n_items = int.Parse(value);
-                        product = new CoffeeAndSideTables();
-
-                        item_label += n_items;
-                        item_label += " x " + language.CoffeeAndSideTables() + "; ";
-                    }
-                    else if (key.Contains(language.DiningOrPatioTables()))
-                    {//DINING OR PATIO TABLES  1
-                        n_items = int.Parse(value);
-                        product = new DinningOrPatioTables();
-
-                        item_label += n_items;
-                        item_label += " x " + language.DiningOrPatioTables() + "; ";
-                    }
-                    else if (key.Contains(language.Chairs()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Chairs();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Chairs() + "; ";
-                    }
-                    else if (key.Contains(language.Library()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Library();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Library() + "; ";
-                    }
-                    else if (key.Contains(language.DrawerFolderCabinet()))
-                    {
-                        //DRAWER FOLDER CABINET 1
-                        n_items = int.Parse(value);
-                        product = new DrawerFolderCabinet();
-
-                        item_label += n_items;
-                        item_label += " x " + language.DrawerFolderCabinet() + "; ";
-                    }
-                    else if (key.Contains(language.DessertHucheCabinets()))
-                    {
-                        //DESSERT, HUCHE, CABINETS  1
-                        n_items = int.Parse(value);
-                        product = new DessertHucheCabinets();
-
-                        item_label += n_items;
-                        item_label += " x " + language.DessertHucheCabinets() + "; ";
-                    }
-                    else if (key.Contains(language.MirrorsFrames()))
-                    {
-                        //MIRRORS - FRAMES    2
-                        n_items = int.Parse(value);
-                        product = new MirrorsFrames();
-
-                        item_label += n_items;
-                        item_label += " x " + language.MirrorsFrames() + "; ";
-                    }
-                    else if (key.Contains(language.LargeCarpet()))
-                    {
-                        //LARGE CARPET 1
-                        n_items = int.Parse(value);
-                        product = new CarpetLarge();
-
-                        item_label += n_items;
-                        item_label += " x " + language.LargeCarpet() + "; ";
-                    }
-                    else if (key.Contains(language.SmallMediumCarpet()))
-                    {
-                        //LARGE CARPET 1
-                        n_items = int.Parse(value);
-                        product = new CarpetMedium();
-
-                        item_label += n_items;
-                        item_label += " x " + language.SmallMediumCarpet() + "; ";
-                    }
-                    else if (key.Contains(language.LampsAndLampShades()))
-                    {
-                        //LAMPE 1
-                        n_items = int.Parse(value);
-                        product = new LampsAndLampShades();
-
-                        item_label += n_items;
-                        item_label += " x " + language.LampsAndLampShades() + "; ";
-                    }
-                    else if (key.Contains(language.Safe()))
-                    {
-                        if (key.Contains(language.SentenceSmall()))
-                        {
-                            n_items = 1;
-
-                            item_label += " Small SAFE; ";
-                            product = new SafeSmall();;
-                        }
-                        else if (key.Contains(language.SentenceAverage()))
-                        {
-                            n_items = 1;
-
-                            item_label += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                            product = new SafeMedium();
-                        }
-                        else if (key.Contains(language.SentenceBig()))
-                        {
-                            n_items = 1;
-
-                            item_label += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
-                            product = new SafeLarge();
-                        }
-                    }
-                    else if (key.Contains(language.Piano()))
-                    {
-                        if (key.Contains(language.SentenceSmall()))
-                        {
-                            n_items = 1;
-
-                            item_label += " Small PIANO; ";
-                            product = new PianoSmall();
-                        }
-                        else if (key.Contains(language.SentenceAverage()))
-                        {
-                            n_items = 1;
-
-                            item_label += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
-                            product = new PianoMedium();
-                        }
-                        else if (key.Contains(language.SentenceBig()))
-                        {
-                            n_items = 1;
-
-                            item_label += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
-                            product = new PianoLarge();
-                        }
-                    }
-                    else if (key.Contains(language.Barbecue()))
-                    {
-                        //BARBECUE	2
-                        n_items = int.Parse(value);
-                        product = new Barbecue();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Barbecue() + "; ";
-                    }
-                    else if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
-                    {
-                        //VÉLO	1
-                        n_items = int.Parse(value);
-                        product = new Bike();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Bike() + "; ";
-                    }
-                    else if (key.Contains(language.Suitcases()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Suitcases();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Suitcases() + "; ";
-                    }
-                    else if (key.Contains(language.Tires()))
-                    {
-                        //PNEUS   13
-                        n_items = int.Parse(value);
-                        product = new Tires();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Tires() + "; ";
-                    }
-                    else if (key.Contains(language.Treadmill()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new Treadmill();
-
-                        item_label += n_items;
-                        item_label += " x " + language.Treadmill() + "; ";
-                    }
-                    else if (key.Contains(language.StationaryBikes()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new StationaryBikes();
-
-                        item_label += n_items;
-                        item_label += " x " + language.StationaryBikes() + "; ";
-                    }
-                    else if (key.Contains(language.PoolTable()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new PoolTable();
-
-                        item_label += n_items;
-                        item_label += " x " + language.PoolTable() + "; ";
-                    }
-                    else if (key.Contains(language.YourBoxesApproximate()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new YourBoxesApproximate();
-
-                        item_label += n_items;
-                        item_label += " x " + language.YourBoxesApproximate() + "; ";
-                    }
-                    else if (key.Contains(language.WardrobeBoxes4Provided()))
-                    {
-                        n_items = int.Parse(value);
-                        product = new WardrobeBoxes4Provided();
-
-                        item_label += n_items;
-                        item_label += " x " + language.WardrobeBoxes4Provided() + "; ";
-                    }
-                    else if (key.Contains(language.MoreDetails()))
-                    {
-                        //PLUS DE PRÉCISIONS rien pour l\'instant
-                        s_notes += "\n" + language.MoreDetails() + ": ";
-                        s_notes += value;
-                    }
-                    else if (key.Contains(language.HowDidYouHearAboutUs()))
-                    {
-                        s_notes += '\n' + value;
-                        textBox_Destination_source.Text = value;
-                    }
-
-                    // TODO: Calcualte
-                    if (n_items > 0)
-                    {
-                        s_inventory += item_label;
-
-                        dVolume += product.Volume() * n_items;
-                        dLoading_time += product.Loading() * n_items;
-                        dUnLoading_time += product.Unloading() * n_items;
-                    }
-
-                    // TODO: Next loop
-                    n_Line++;
-                    n_items = 0;
                 }
-
-                // inventory completed and basic loading times
-                //Adjust times with floors
-                if (textBox_Starting_address_floor.Text.Contains("Entrepôt.") || textBox_Starting_address_floor.Text.Contains("Warehouse."))
-                    dLoading_time *= 1.35;
-                if (textBox_Destination_address_floor.Text.Contains("Entrepôt.") || textBox_Destination_address_floor.Text.Contains("Warehouse."))
-                    dUnLoading_time *= 1.35;
-                if (textBox_Starting_address_floor.Text.Contains("Ascenseur dans immeuble.") || textBox_Starting_address_floor.Text.Contains("Elevator in the building."))
-                    dLoading_time *= 1.5;
-                if (textBox_Destination_address_floor.Text.Contains("Ascenseur dans immeuble.") || textBox_Destination_address_floor.Text.Contains("Elevator in the building."))
-                    dUnLoading_time *= 1.5;
-
-
-                if (textBox_Starting_address_floor.Text.Contains("Demi Sous-Sol") || textBox_Starting_address_floor.Text.Contains("Basement."))
-                    dLoading_time *= 1.15;
-                if (textBox_Destination_address_floor.Text.Contains("Demi Sous-Sol") || textBox_Destination_address_floor.Text.Contains("Basement"))
-                    dUnLoading_time *= 1.15;
-                if (textBox_Starting_address_floor.Text.Contains("1er niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("1st level above RC"))
-                    dLoading_time *= 1.2;
-                if (textBox_Destination_address_floor.Text.Contains("1er niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("1st level above RC"))
-                    dUnLoading_time *= 1.2;
-                if (textBox_Starting_address_floor.Text.Contains("2e niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("2nd level above RC"))
-                    dLoading_time *= 1.35;
-                if (textBox_Destination_address_floor.Text.Contains("2e niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("2nd level above RC"))
-                    dUnLoading_time *= 1.35;
-                if (textBox_Starting_address_floor.Text.Contains("3e niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("3rd level above RC"))
-                    dLoading_time *= 1.6;
-                if (textBox_Destination_address_floor.Text.Contains("3e niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("3rd level above RC)"))
-                    dUnLoading_time *= 1.6;
-
-                // round values
-                dVolume = Math.Round(dVolume, 2);
-                dLoading_time = Math.Round(dLoading_time, 2);
-                dUnLoading_time = Math.Round(dUnLoading_time, 2);
-                //nb of trucks
-                //39 cubic meter is max load capacity of 22' truck
-                dnb_of_trucks = Math.Ceiling(dVolume / 39);
-                label_nb_of_trucks.Text = " " + dnb_of_trucks + " camion";
-                if (dnb_of_trucks > 1)
+                else if (key.Contains(language.Piano()))
                 {
-                    label_nb_of_trucks.Text += "s";
+                    if (key.Contains(language.SentenceSmall()))
+                    {
+                        n_items = 1;
+
+                        item_label += " Small PIANO; ";
+                        product = new PianoSmall();
+                    }
+                    else if (key.Contains(language.SentenceAverage()))
+                    {
+                        n_items = 1;
+
+                        item_label += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
+                        product = new PianoMedium();
+                    }
+                    else if (key.Contains(language.SentenceBig()))
+                    {
+                        n_items = 1;
+
+                        item_label += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
+                        product = new PianoLarge();
+                    }
                 }
-                label_nb_of_trucks.Text += " 22 pieds à ";
-                // % of loading
-                label_nb_of_trucks.Text += Math.Ceiling(100 * dVolume / (39 * Math.Ceiling((Double)dVolume / 39))) + "%";
-                if (dnb_of_trucks > 1)
+                else if (key.Contains(language.Barbecue()))
                 {
-                    label_nb_of_trucks.Text += " ou " + dnb_of_trucks + " voyages avec le même camion si possible";
+                    //BARBECUE	2
+                    n_items = int.Parse(value);
+                    product = new Barbecue();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Barbecue() + "; ";
                 }
-                label_nb_of_trucks.Text += ".";
-                if (Math.Ceiling(100 * dVolume / (39 * Math.Ceiling((Double)dVolume / 39))) > 85)
+                else if (key.Contains(language.Bike()) && !key.Contains(language.StationaryBikes()))
                 {
-                    label_nb_of_trucks.Text += "\n  (!) risque de débordement.";
+                    //VÉLO	1
+                    n_items = int.Parse(value);
+                    product = new Bike();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Bike() + "; ";
+                }
+                else if (key.Contains(language.Suitcases()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Suitcases();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Suitcases() + "; ";
+                }
+                else if (key.Contains(language.Tires()))
+                {
+                    //PNEUS   13
+                    n_items = int.Parse(value);
+                    product = new Tires();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Tires() + "; ";
+                }
+                else if (key.Contains(language.Treadmill()))
+                {
+                    n_items = int.Parse(value);
+                    product = new Treadmill();
+
+                    item_label += n_items;
+                    item_label += " x " + language.Treadmill() + "; ";
+                }
+                else if (key.Contains(language.StationaryBikes()))
+                {
+                    n_items = int.Parse(value);
+                    product = new StationaryBikes();
+
+                    item_label += n_items;
+                    item_label += " x " + language.StationaryBikes() + "; ";
+                }
+                else if (key.Contains(language.PoolTable()))
+                {
+                    n_items = int.Parse(value);
+                    product = new PoolTable();
+
+                    item_label += n_items;
+                    item_label += " x " + language.PoolTable() + "; ";
+                }
+                else if (key.Contains(language.YourBoxesApproximate()))
+                {
+                    n_items = int.Parse(value);
+                    product = new YourBoxesApproximate();
+
+                    item_label += n_items;
+                    item_label += " x " + language.YourBoxesApproximate() + "; ";
+                }
+                else if (key.Contains(language.WardrobeBoxes4Provided()))
+                {
+                    n_items = int.Parse(value);
+                    product = new WardrobeBoxes4Provided();
+
+                    item_label += n_items;
+                    item_label += " x " + language.WardrobeBoxes4Provided() + "; ";
+                }
+                else if (key.Contains(language.MoreDetails()))
+                {
+                    //PLUS DE PRÉCISIONS rien pour l\'instant
+                    s_notes += "\n" + language.MoreDetails() + ": ";
+                    s_notes += value;
+                }
+                else if (key.Contains(language.HowDidYouHearAboutUs()))
+                {
+                    s_notes += '\n' + value;
+                    textBox_Destination_source.Text = value;
                 }
 
+                // TODO: Calcualte
+                if (n_items > 0)
+                {
+                    s_inventory += item_label;
 
+                    dVolume += product.Volume() * n_items;
+                    dLoading_time += product.Loading() * n_items;
+                    dUnLoading_time += product.Unloading() * n_items;
+                }
 
-                // fill labels for 2 men
-                label_2men_loading_time.Text = "";
-                label_2men_loading_time.Text += dLoading_time;
-                label_2men_unloading_time.Text = "";
-                label_2men_unloading_time.Text += dUnLoading_time;
-                // fill labels for 3 men
-                label_3men_loading_time.Text = "";
-                label_3men_loading_time.Text += Math.Round((Double)dLoading_time * 0.7, 2);
-                label_3men_unloading_time.Text = "";
-                label_3men_unloading_time.Text += Math.Round((Double)dUnLoading_time * 0.7, 2);
-                // fill labels for 4 men
-                label_4men_loading_time.Text = "";
-                label_4men_loading_time.Text += Math.Round((Double)dLoading_time * 0.55, 2);
-                label_4men_unloading_time.Text = "";
-                label_4men_unloading_time.Text += Math.Round((Double)dUnLoading_time * 0.55, 2);
-
+                // TODO: Next loop
+                n_Line++;
+                n_items = 0;
             }
-            Move_description.Text += "Analyse completed...";
         }
 
+        private void updateUIWhenAnalyseMoveCompleted()
+        {
+            // inventory completed and basic loading times
+            //Adjust times with floors
+            if (textBox_Starting_address_floor.Text.Contains("Entrepôt.") || textBox_Starting_address_floor.Text.Contains("Warehouse."))
+                dLoading_time *= 1.35;
+            if (textBox_Destination_address_floor.Text.Contains("Entrepôt.") || textBox_Destination_address_floor.Text.Contains("Warehouse."))
+                dUnLoading_time *= 1.35;
+            if (textBox_Starting_address_floor.Text.Contains("Ascenseur dans immeuble.") || textBox_Starting_address_floor.Text.Contains("Elevator in the building."))
+                dLoading_time *= 1.5;
+            if (textBox_Destination_address_floor.Text.Contains("Ascenseur dans immeuble.") || textBox_Destination_address_floor.Text.Contains("Elevator in the building."))
+                dUnLoading_time *= 1.5;
+
+
+            if (textBox_Starting_address_floor.Text.Contains("Demi Sous-Sol") || textBox_Starting_address_floor.Text.Contains("Basement."))
+                dLoading_time *= 1.15;
+            if (textBox_Destination_address_floor.Text.Contains("Demi Sous-Sol") || textBox_Destination_address_floor.Text.Contains("Basement"))
+                dUnLoading_time *= 1.15;
+            if (textBox_Starting_address_floor.Text.Contains("1er niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("1st level above RC"))
+                dLoading_time *= 1.2;
+            if (textBox_Destination_address_floor.Text.Contains("1er niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("1st level above RC"))
+                dUnLoading_time *= 1.2;
+            if (textBox_Starting_address_floor.Text.Contains("2e niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("2nd level above RC"))
+                dLoading_time *= 1.35;
+            if (textBox_Destination_address_floor.Text.Contains("2e niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("2nd level above RC"))
+                dUnLoading_time *= 1.35;
+            if (textBox_Starting_address_floor.Text.Contains("3e niveau au-dessus du RC") || textBox_Starting_address_floor.Text.Contains("3rd level above RC"))
+                dLoading_time *= 1.6;
+            if (textBox_Destination_address_floor.Text.Contains("3e niveau au-dessus du RC") || textBox_Destination_address_floor.Text.Contains("3rd level above RC)"))
+                dUnLoading_time *= 1.6;
+
+            // round values
+            dVolume = Math.Round(dVolume, 2);
+            dLoading_time = Math.Round(dLoading_time, 2);
+            dUnLoading_time = Math.Round(dUnLoading_time, 2);
+            //nb of trucks
+            //39 cubic meter is max load capacity of 22' truck
+            dnb_of_trucks = Math.Ceiling(dVolume / 39);
+            label_nb_of_trucks.Text = " " + dnb_of_trucks + " camion";
+            if (dnb_of_trucks > 1)
+            {
+                label_nb_of_trucks.Text += "s";
+            }
+            label_nb_of_trucks.Text += " 22 pieds à ";
+            // % of loading
+            label_nb_of_trucks.Text += Math.Ceiling(100 * dVolume / (39 * Math.Ceiling((Double)dVolume / 39))) + "%";
+            if (dnb_of_trucks > 1)
+            {
+                label_nb_of_trucks.Text += " ou " + dnb_of_trucks + " voyages avec le même camion si possible";
+            }
+            label_nb_of_trucks.Text += ".";
+            if (Math.Ceiling(100 * dVolume / (39 * Math.Ceiling((Double)dVolume / 39))) > 85)
+            {
+                label_nb_of_trucks.Text += "\n  (!) risque de débordement.";
+            }
+
+            // fill labels for 2 men
+            label_2men_loading_time.Text = "";
+            label_2men_loading_time.Text += dLoading_time;
+            label_2men_unloading_time.Text = "";
+            label_2men_unloading_time.Text += dUnLoading_time;
+            // fill labels for 3 men
+            label_3men_loading_time.Text = "";
+            label_3men_loading_time.Text += Math.Round((Double)dLoading_time * 0.7, 2);
+            label_3men_unloading_time.Text = "";
+            label_3men_unloading_time.Text += Math.Round((Double)dUnLoading_time * 0.7, 2);
+            // fill labels for 4 men
+            label_4men_loading_time.Text = "";
+            label_4men_loading_time.Text += Math.Round((Double)dLoading_time * 0.55, 2);
+            label_4men_unloading_time.Text = "";
+            label_4men_unloading_time.Text += Math.Round((Double)dUnLoading_time * 0.55, 2);
+
+            Move_description.Text += "Analyse completed...";
+        }
 
         private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
         {
