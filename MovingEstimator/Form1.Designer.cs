@@ -631,23 +631,6 @@ namespace MovingEstimator
         private System.Windows.Forms.Button Analyse_move;
         private System.Windows.Forms.RichTextBox RTXTbox_Contrat;
 
-        private string s_client_name,
-            s_client_phn_number,
-            s_client_email,
-            s_moving_date,
-            s_moving_date2,
-            s_moving_date3,
-            s_inventory,
-            s_notes;
-        private double dLoading_time,
-            dUnLoading_time,
-            dVolume,
-            dDistance,
-            dHourly_rate,
-            dMoving_estimated_cost,
-            dnb_of_trucks;
-        private int nPlastic_bags,
-            nWardrobe_boxes;
         private System.Windows.Forms.MonthCalendar monthCalendar1;
         private System.Windows.Forms.MonthCalendar monthCalendar2;
         private System.Windows.Forms.MonthCalendar monthCalendar3;

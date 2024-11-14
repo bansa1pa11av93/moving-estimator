@@ -12,6 +12,24 @@ namespace MovingEstimator
 {
     public partial class Form1 : Form
     {
+        private string s_client_name,
+            s_client_phn_number,
+            s_client_email,
+            s_moving_date,
+            s_moving_date2,
+            s_moving_date3,
+            s_inventory,
+            s_notes;
+        private double dLoading_time,
+            dUnLoading_time,
+            dVolume,
+            dDistance,
+            dHourly_rate,
+            dMoving_estimated_cost,
+            dnb_of_trucks;
+        private int nPlastic_bags,
+            nWardrobe_boxes;
+
         public Form1()
         {
             InitializeComponent();
@@ -34,82 +52,80 @@ namespace MovingEstimator
             if (Move_description.Text.Length > 2)
             {
                 // divides text into lines
-                string[] s_Lines = Move_description.Text.Split(new char[] { '\n' });
+                string[] s_Lines = Move_description.Text.Split(new string[] { "\n\n" }, StringSplitOptions.None);
                 int n_Line = 0;
                 // french or english  form ?
                 //French form
                 if (Move_description.Text.Contains("ÉTAPE 1 - INFORMATIONS CLIENT"))
                 {
+                    string key, value;
+                    string[] arr;
                     while (n_Line < s_Lines.Length)
                     {
-                        s_Lines[n_Line].Trim();// remove leading and trailing white spaces
-                        if (1 < s_Lines[n_Line].Length)
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(s_Lines[n_Line].Length - 1);// delete line return
+                        arr = Move_description.Text.Split(new string[] { "\n" }, StringSplitOptions.None);
+                        if (arr.Length < 2) throw new Exception("Invalid format");
 
-                        if (s_Lines[n_Line].Contains("NOM ET PRÉNOM"))
+                        key = arr[0].Trim();
+                        value = arr[1].Trim();
+
+                        if (key.Contains("NOM ET PRÉNOM"))
                         {
-                            // delete NOM ET PRÉNOM
-                            s_client_name = s_Lines[n_Line].Remove(0, 14);
+                            s_client_name = value;
                         }
-                        if (s_Lines[n_Line].Contains("TITRE"))
+                        else if (key.Contains("TITRE"))
                         {
-                            //delete TITRE
-                            string title_and_name = s_Lines[n_Line].Remove(0, 6);
+                            string title_and_name = value;
                             title_and_name += " " + s_client_name;
                             s_client_name = title_and_name;
                         }
-                        if (s_Lines[n_Line].Contains("COURRIEL"))
+                        if (key.Contains("COURRIEL"))
                         {
-                            //delete courriel
-                            s_client_email = s_Lines[n_Line].Remove(0, 9);
+                            s_client_email = value;
                         }
-                        if (s_Lines[n_Line].Contains("TÉLÉPHONE"))
+                        if (key.Contains("TÉLÉPHONE"))
                         {
-                            //delete TÉLÉPHONE
-                            s_client_phn_number = s_Lines[n_Line].Remove(0, 10);
+                            s_client_phn_number = value;
                         }
-                        if (s_Lines[n_Line].Contains("DATE") && !s_Lines[n_Line].Contains("FLEXIBLE"))
+                        if (key.Contains("DATE") && !key.Contains("FLEXIBLE"))
                         {
                             //delete date
-                            s_moving_date = s_Lines[n_Line].Remove(0, 5);
+                            s_moving_date = value;
                             DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
                             monthCalendar1.SetDate(dt1);
                             monthCalendar2.SetDate(dt1);
                             monthCalendar3.SetDate(dt1);
 
                         }
-                        if (s_Lines[n_Line].Contains("DATE FLEXIBLE ?"))
+                        if (key.Contains("DATE FLEXIBLE ?"))
                         {
                             //DATE FLEXIBLE ?	DATE EXACTE
-                            //delete DATE FLEXIBLE ?	
-                            label_flexible_date.Text = s_Lines[n_Line].Remove(0, 16);
+                            label_flexible_date.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("ADRESSE DE DÉPART + VILLE"))
+                        if (key.Contains("ADRESSE DE DÉPART + VILLE"))
+                        {
+                            textBox_Starting_address.Text = value;
+                        }
+                        if (key.Contains("ADRESSE DESTINATION + VILLE"))
                         {
                             //delete ADRESSE DE DÉPART + VILLE
-                            textBox_Starting_address.Text = s_Lines[n_Line].Remove(0, 26);
+                            textBox_Destination_address.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("ADRESSE DESTINATION + VILLE"))
-                        {
-                            //delete ADRESSE DE DÉPART + VILLE
-                            textBox_Destination_address.Text = s_Lines[n_Line].Remove(0, 28);
-                        }
-                        if (s_Lines[n_Line].Contains("ÉTAGE ADRESSE DE DÉPART"))
+                        if (key.Contains("ÉTAGE ADRESSE DE DÉPART"))
                         {
                             //delete ADRESSE DE DÉPART
-                            textBox_Starting_address_floor.Text = s_Lines[n_Line].Remove(0, 24);
+                            textBox_Starting_address_floor.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("ÉTAGE ADRESSE DE DESTINATION"))
+                        if (key.Contains("ÉTAGE ADRESSE DE DESTINATION"))
                         {
                             //delete ADRESSE DE DÉPART
-                            textBox_Destination_address_floor.Text = s_Lines[n_Line].Remove(0, 29);
+                            textBox_Destination_address_floor.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("RÉFRIGÉRATEUR"))
+                        if (key.Contains("RÉFRIGÉRATEUR"))
                         {
-                            if (!s_Lines[n_Line].Contains("PETIT") && !s_Lines[n_Line].Contains("GRAND"))// both previous ifs were false
+                            if (!key.Contains("PETIT") && !key.Contains("GRAND"))// both previous ifs were false
                             {
                                 //RÉFRIGÉRATEUR	1
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -120,10 +136,10 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.1;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("GRAND"))
+                            if (key.Contains("GRAND"))
                             {
                                 //GRAND RÉFRIGÉRATEUR	1 
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 20);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -134,10 +150,10 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.15;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("PETIT"))
+                            if (key.Contains("PETIT"))
                             {
                                 //PETIT RÉFRIGÉRATEUR 1
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 20);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -149,10 +165,10 @@ namespace MovingEstimator
                                 }
                             }
                         }// fridges
-                        if (s_Lines[n_Line].Contains("GROS CONGÉLATEUR"))
+                        if (key.Contains("GROS CONGÉLATEUR"))
                         {
                             //GROS CONGÉLATEUR    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -164,10 +180,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.12;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CONGÉLATEUR MOYEN"))
+                        if (key.Contains("CONGÉLATEUR MOYEN"))
                         {
                             //CONGÉLATEUR MOYEN   1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -179,10 +195,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CUISINIÈRES - FOUR/POÊLE"))
+                        if (key.Contains("CUISINIÈRES - FOUR/POÊLE"))
                         {
                             //CUISINIÈRES - FOUR / POÊLE    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -194,10 +210,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LAVE VAISSELLE"))
+                        if (key.Contains("LAVE VAISSELLE"))
                         {
                             //LAVE VAISSELLE    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -209,10 +225,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SÉCHEUSE") && !s_Lines[n_Line].Contains("SUPERPOSÉES"))
+                        if (key.Contains("SÉCHEUSE") && !key.Contains("SUPERPOSÉES"))
                         {
                             //SÉCHEUSE    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 9);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -224,10 +240,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LAVEUSE") && !s_Lines[n_Line].Contains("SUPERPOSÉES"))
+                        if (key.Contains("LAVEUSE") && !key.Contains("SUPERPOSÉES"))
                         {
                             //LAVEUSE    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -239,16 +255,16 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("Sécheuse au dessus laveuse"))
+                        if (key.Contains("Sécheuse au dessus laveuse"))
                         {
                             //LAVEUSE - SECHEUSE SUPERPOSÉES ?	Sécheuse au dessus laveuse
                             s_inventory += " Sécheuse au dessus laveuse; ";
                             dLoading_time += 0.1;
                             dUnLoading_time += 0.1;
                         }
-                        if (s_Lines[n_Line].Contains("BASE DE LIT KING"))
+                        if (key.Contains("BASE DE LIT KING"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -260,9 +276,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.13;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BASE DE LIT QUEEN"))
+                        if (key.Contains("BASE DE LIT QUEEN"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -274,9 +290,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BASE DE LIT DOUBLE"))
+                        if (key.Contains("BASE DE LIT DOUBLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -288,9 +304,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BASE DE LIT SIMPLE"))
+                        if (key.Contains("BASE DE LIT SIMPLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -302,9 +318,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MATELAS KING"))
+                        if (key.Contains("MATELAS KING"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 13);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += 2 * n_items;
                             if (n_items > 0)
@@ -318,9 +334,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MATELAS QUEEN"))
+                        if (key.Contains("MATELAS QUEEN"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -334,9 +350,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MATELAS DOUBLE"))
+                        if (key.Contains("MATELAS DOUBLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -350,10 +366,11 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MATELAS SIMPLE"))
+                        if (key.Contains("MATELAS SIMPLE"))
                         {
+                            Console.WriteLine(s_Lines[n_Line]);
                             //MATELAS SIMPLE(PETIT)
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 22);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -366,9 +383,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SOMMIER KING"))
+                        if (key.Contains("SOMMIER KING"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 13);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -382,9 +399,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SOMMIER SIMPLE"))
+                        if (key.Contains("SOMMIER SIMPLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -397,9 +414,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SOMMIER QUEEN"))
+                        if (key.Contains("SOMMIER QUEEN"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -412,9 +429,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SOMMIER DOUBLE"))
+                        if (key.Contains("SOMMIER DOUBLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -427,9 +444,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("COMMODE"))
+                        if (key.Contains("COMMODE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -440,10 +457,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TABLE DE CHEVET"))
+                        if (key.Contains("TABLE DE CHEVET"))
                         {
                             //TABLE DE CHEVET 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -455,10 +472,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("(2 PORTES)"))
+                        if (key.Contains("(2 PORTES)"))
                         {
                             //ARMOIRE(2 PORTES)  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -469,10 +486,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("(1 PORTE)"))
+                        if (key.Contains("(1 PORTE)"))
                         {
                             //ARMOIRE(1 PORTE)  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -483,9 +500,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BERCEAU"))
+                        if (key.Contains("BERCEAU"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -497,9 +514,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CAUSEUSE"))
+                        if (key.Contains("CAUSEUSE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -511,9 +528,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.06;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CANAPÉ"))
+                        if (key.Contains("CANAPÉ"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 21);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -525,9 +542,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.10;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("FAUTEUIL"))
+                        if (key.Contains("FAUTEUIL"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 9);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -539,11 +556,11 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MEUBLE TÉLÉ"))
+                        if (key.Contains("MEUBLE TÉLÉ"))
                         {
-                            if (s_Lines[n_Line].Contains("GRAND"))
+                            if (key.Contains("GRAND"))
                             {
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -554,9 +571,9 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.2;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("MOYEN"))
+                            if (key.Contains("MOYEN"))
                             {
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 26);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -569,11 +586,11 @@ namespace MovingEstimator
                             }
                         }
 
-                        if (s_Lines[n_Line].Contains("TÉLÉVISEUR"))
+                        if (key.Contains("TÉLÉVISEUR"))
                         {
-                            if (s_Lines[n_Line].Contains("GRAND"))
+                            if (key.Contains("GRAND"))
                             {// TÉLÉVISEUR(GRAND) 2
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -584,9 +601,9 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.1;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("MOYEN"))
+                            if (key.Contains("MOYEN"))
                             {
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -599,9 +616,9 @@ namespace MovingEstimator
                             }
                         }
 
-                        if (s_Lines[n_Line].Contains("TABLE DE CAFÉ, DE BOUT"))
+                        if (key.Contains("TABLE DE CAFÉ, DE BOUT"))
                         {//TABLE DE CAFÉ, DE BOUT  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 23);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -612,9 +629,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TABLES À MANGER OU DE TERRASSE"))
+                        if (key.Contains("TABLES À MANGER OU DE TERRASSE"))
                         {//TABLES À MANGER  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 31);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -625,9 +642,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CHAISES"))
+                        if (key.Contains("CHAISES"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -639,9 +656,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BIBILIOTHEQUE"))
+                        if (key.Contains("BIBILIOTHEQUE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -653,10 +670,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("ARMOIRE DE DOSSIER"))
+                        if (key.Contains("ARMOIRE DE DOSSIER"))
                         {
                             //ARMOIRE DE DOSSIER À TIROIR 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 28);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -667,10 +684,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DESSERTE, HUCHE, CABINETS"))
+                        if (key.Contains("DESSERTE, HUCHE, CABINETS"))
                         {
                             //DESSERTE, HUCHE, CABINETS   1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 26);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -681,10 +698,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MIROIRS - CADRES"))
+                        if (key.Contains("MIROIRS - CADRES"))
                         {
                             //MIROIRS - CADRES    2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -695,10 +712,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("GRAND TAPIS"))
+                        if (key.Contains("GRAND TAPIS"))
                         {
                             //GRAND TAPIS 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 12);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -709,10 +726,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TAPIS ( PETIT OU MOYEN )"))
+                        if (key.Contains("TAPIS ( PETIT OU MOYEN )"))
                         {
                             //TAPIS ( PETIT OU MOYEN )	1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -723,10 +740,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LAMPES ET ABAT-JOURS"))
+                        if (key.Contains("LAMPES ET ABAT-JOURS"))
                         {
                             //LAMPE 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 21);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -737,23 +754,23 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("COFFRE FORT"))
+                        if (key.Contains("COFFRE FORT"))
                         {
-                            if (s_Lines[n_Line].Contains("Petit"))
+                            if (key.Contains("Petit"))
                             {
                                 s_inventory += " COFFRE FORT Petit; ";
                                 dVolume += .4;
                                 dLoading_time += 0.04;
                                 dUnLoading_time += 0.03;
                             }
-                            if (s_Lines[n_Line].Contains("Moyen"))
+                            if (key.Contains("Moyen"))
                             {
                                 s_inventory += "---- COFFRE FORT Moyen ( maximum 300 lbs, sinon 1h extra); ----";
                                 dVolume += .6;
                                 dLoading_time += 0.4;
                                 dUnLoading_time += 0.2;
                             }
-                            if (s_Lines[n_Line].Contains("Grand"))
+                            if (key.Contains("Grand"))
                             {
                                 s_inventory += "---- COFFRE FORT Grand ( maximum 300 lbs, sinon 1h extra); ----";
                                 dVolume += 1.2;
@@ -761,23 +778,23 @@ namespace MovingEstimator
                                 dUnLoading_time += .5;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("PIANO"))
+                        if (key.Contains("PIANO"))
                         {
-                            if (s_Lines[n_Line].Contains("Petit"))
+                            if (key.Contains("Petit"))
                             {
                                 s_inventory += " PIANO Petit; ";
                                 dVolume += .4;
                                 dLoading_time += 0.04;
                                 dUnLoading_time += 0.03;
                             }
-                            if (s_Lines[n_Line].Contains("Moyen"))
+                            if (key.Contains("Moyen"))
                             {
                                 s_inventory += "---- PIANO Moyen ( maximum 300 lbs, sinon 1h extra); ----";
                                 dVolume += .6;
                                 dLoading_time += 1.4;
                                 dUnLoading_time += 0.2;
                             }
-                            if (s_Lines[n_Line].Contains("Grand"))
+                            if (key.Contains("Grand"))
                             {
                                 s_inventory += "---- PIANO Grand ( maximum 300 lbs, sinon 2h extra); ----";
                                 dVolume += 1.2;
@@ -785,10 +802,10 @@ namespace MovingEstimator
                                 dUnLoading_time += .5;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BARBECUE"))
+                        if (key.Contains("BARBECUE"))
                         {
                             //BARBECUE	2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 9);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -799,9 +816,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.04;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BICYCLETTES / VÉLOS"))
+                        if (key.Contains("BICYCLETTES / VÉLOS"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 20);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -812,10 +829,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("VALISES"))
+                        if (key.Contains("VALISES"))
                         {
                             //VALISES	2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -826,10 +843,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("PNEUS"))
+                        if (key.Contains("PNEUS"))
                         {
                             //PNEUS   13
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 6);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -841,10 +858,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TAPIS ROULANT"))
+                        if (key.Contains("TAPIS ROULANT"))
                         {
                             //TAPIS ROULANT   1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -855,9 +872,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.15;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("VÉLOS STATIONNAIRES"))
+                        if (key.Contains("VÉLOS STATIONNAIRES"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 20);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -868,10 +885,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TABLE DE BILLARD"))
+                        if (key.Contains("TABLE DE BILLARD"))
                         {
                             //TABLE DE BILLARD    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -882,10 +899,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 3;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("VOS BOITES (APPROXIMATIF)"))
+                        if (key.Contains("VOS BOITES (APPROXIMATIF)"))
                         {
                             //BOITES(APPROXIMATIF)   250
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 26);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -897,9 +914,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * .01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BOITES GARDE-ROBE (4 FOURNIES)"))
+                        if (key.Contains("BOITES GARDE-ROBE (4 FOURNIES)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 31);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -912,17 +929,17 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * .03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("PLUS DE PRÉCISIONS"))
+                        if (key.Contains("PLUS DE PRÉCISIONS"))
                         {
                             //PLUS DE PRÉCISIONS 
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                            s_Lines[n_Line] = value;
                             s_notes += "\nNotes client:\n ";
                             s_notes += s_Lines[n_Line] + " \n";
                         }
-                        if (s_Lines[n_Line].Contains("COMMENT AVEZ-VOUS"))
+                        if (key.Contains("COMMENT AVEZ-VOUS"))
                         {
                             s_notes += " \n" + s_Lines[n_Line];
-                            textBox_Destination_source.Text = s_Lines[n_Line].Remove(0, 42);
+                            textBox_Destination_source.Text = value;
                         }
                         n_Line++;
                         n_items = 0;
@@ -931,41 +948,45 @@ namespace MovingEstimator
                 // English form
                 if (Move_description.Text.Contains("STEP 1 - CUSTOMER INFORMATION"))
                 {
+                    string key, value;
+                    string[] arr;
                     while (n_Line < s_Lines.Length)
                     {
-                        s_Lines[n_Line].Trim();// remove leading and trailing white spaces
-                        if (1 < s_Lines[n_Line].Length)
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(s_Lines[n_Line].Length - 1);// delete line return
+                        arr = Move_description.Text.Split(new string[] { "\n" }, StringSplitOptions.None);
+                        if (arr.Length < 2) throw new Exception("Invalid format");
 
-                        if (s_Lines[n_Line].Contains("LEGAL NAME"))
+                        key = arr[0].Trim();
+                        value = arr[1].Trim();
+
+                        if (key.Contains("LEGAL NAME"))
                         {
                             // delete FIRST NAME
-                            s_client_name += s_Lines[n_Line].Remove(0, 11);
+                            s_client_name += value;
                             // add separator
                             s_client_name += ' ';
                         }
-                        if (s_Lines[n_Line].Contains("TITLE"))
+                        if (key.Contains("TITLE"))
                         {
                             //delete TITLE
-                            string title_and_name = s_Lines[n_Line].Remove(0, 6);
+                            string title_and_name = value;
                             title_and_name += " " + s_client_name;
                             s_client_name = title_and_name;
 
                         }
-                        if (s_Lines[n_Line].Contains("E-MAIL"))
+                        if (key.Contains("E-MAIL"))
                         {
                             //delete E-MAIL
-                            s_client_email = s_Lines[n_Line].Remove(0, 7);
+                            s_client_email = value;
                         }
-                        if (s_Lines[n_Line].Contains("PHONE#"))
+                        if (key.Contains("PHONE#"))
                         {
                             //delete PHONE
-                            s_client_phn_number = s_Lines[n_Line].Remove(0, 7);
+                            s_client_phn_number = value;
                         }
-                        if (s_Lines[n_Line].Contains("MOVING DATE"))
+                        if (key.Contains("MOVING DATE"))
                         {
                             //delete DATED
-                            s_moving_date = s_Lines[n_Line].Remove(0, 12);
+                            s_moving_date = value;
                             label_flexible_date.Text = s_moving_date;
                             DateTime dt1 = new DateTime(int.Parse(s_moving_date.Substring(0, 4)), int.Parse(s_moving_date.Substring(5, 2)), int.Parse(s_moving_date.Substring(8, 2)));
 
@@ -973,36 +994,36 @@ namespace MovingEstimator
                             monthCalendar2.SetDate(dt1);
                             monthCalendar3.SetDate(dt1);
                         }
-                        if (s_Lines[n_Line].Contains("FLEXIBLE DATE?"))
+                        if (key.Contains("FLEXIBLE DATE?"))
                         {
-                            label_flexible_date.Text = s_Lines[n_Line].Remove(0, 15);
+                            label_flexible_date.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("DEPARTURE ADDRESS + CITY"))
+                        if (key.Contains("DEPARTURE ADDRESS + CITY"))
                         {
                             //delete DEPARTURE ADDRESS + CITY
-                            textBox_Starting_address.Text = s_Lines[n_Line].Remove(0, 25);
+                            textBox_Starting_address.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("DESTINATION ADDRESS + CITY"))
+                        if (key.Contains("DESTINATION ADDRESS + CITY"))
                         {
                             //delete DESTINATION ADDRESS + CITY
-                            textBox_Destination_address.Text = s_Lines[n_Line].Remove(0, 27);
+                            textBox_Destination_address.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("FLOOR at DEPARTURE ADDRESS"))
+                        if (key.Contains("FLOOR at DEPARTURE ADDRESS"))
                         {
                             //FLOOR DEPARTURE ADDRESS
-                            textBox_Starting_address_floor.Text = s_Lines[n_Line].Remove(0, 27);
+                            textBox_Starting_address_floor.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("FLOOR at DESTINATION ADDRESS"))
+                        if (key.Contains("FLOOR at DESTINATION ADDRESS"))
                         {
                             //delete FLOOR DESTINATION ADDRESS
-                            textBox_Destination_address_floor.Text = s_Lines[n_Line].Remove(0, 29);
+                            textBox_Destination_address_floor.Text = value;
                         }
-                        if (s_Lines[n_Line].Contains("REFRIGERATOR"))
+                        if (key.Contains("REFRIGERATOR"))
                         {
-                            if (!s_Lines[n_Line].Contains("SMALL") && !s_Lines[n_Line].Contains("LARGE"))// both previous ifs were false
+                            if (!key.Contains("SMALL") && !key.Contains("LARGE"))// both previous ifs were false
                             {
                                 //REFRIGERATOR	1
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 13);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -1013,10 +1034,10 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.1;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("LARGE"))
+                            if (key.Contains("LARGE"))
                             {
                                 //LARGE REFRIGERATOR	1 
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);// delete "LARGE REFRIGERATOR"
+                                s_Lines[n_Line] = value;// delete "LARGE REFRIGERATOR"
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -1027,10 +1048,10 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.15;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("SMALL"))
+                            if (key.Contains("SMALL"))
                             {
                                 //SMALL REFRIGERATOR	1
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -1042,10 +1063,10 @@ namespace MovingEstimator
                                 }
                             }
                         }// fridges
-                        if (s_Lines[n_Line].Contains("LARGE FREEZER"))
+                        if (key.Contains("LARGE FREEZER"))
                         {
                             //LARGE FREEZER   1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1057,10 +1078,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.12;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MEDIUM FREEZER"))
+                        if (key.Contains("MEDIUM FREEZER"))
                         {
                             //MEDIUM FREEZER   1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1072,10 +1093,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("COOKERS - OVEN / STOVE"))
+                        if (key.Contains("COOKERS - OVEN / STOVE"))
                         {
                             //COOKERS - OVEN / STOVE    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 23);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1087,10 +1108,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DISHWASHER"))
+                        if (key.Contains("DISHWASHER"))
                         {
                             //DISHWASHER    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 11);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1102,10 +1123,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DRYER") && !s_Lines[n_Line].Contains("STACKED WASHER - DRYER"))
+                        if (key.Contains("DRYER") && !key.Contains("STACKED WASHER - DRYER"))
                         {
                             //DRYER    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 6);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1117,10 +1138,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("WASHER") && !s_Lines[n_Line].Contains("STACKED WASHER - DRYER"))
+                        if (key.Contains("WASHER") && !key.Contains("STACKED WASHER - DRYER"))
                         {
                             //WASHER    1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 7);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1132,15 +1153,15 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("Dryer above washer"))
+                        if (key.Contains("Dryer above washer"))
                         {
                             s_inventory += " Dryer above washer; ";
                             dLoading_time += 0.1;
                             dUnLoading_time += 0.1;
                         }
-                        if (s_Lines[n_Line].Contains("KING BED BASE"))
+                        if (key.Contains("KING BED BASE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1152,9 +1173,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.13;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("QUEEN BED BASE"))
+                        if (key.Contains("QUEEN BED BASE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1166,9 +1187,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DOUBLE BED BASE"))
+                        if (key.Contains("DOUBLE BED BASE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1180,9 +1201,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SINGLE BED BASE"))
+                        if (key.Contains("SINGLE BED BASE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1194,9 +1215,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.07;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("KING MATTRESS"))
+                        if (key.Contains("KING MATTRESS"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 14);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += 2 * n_items;
                             if (n_items > 0)
@@ -1210,9 +1231,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("QUEEN MATTRESS"))
+                        if (key.Contains("QUEEN MATTRESS"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1226,9 +1247,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DOUBLE MATTRESS"))
+                        if (key.Contains("DOUBLE MATTRESS"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1242,10 +1263,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SINGLE MATTRESS (SMALL)"))
+                        if (key.Contains("SINGLE MATTRESS (SMALL)"))
                         {
                             //SINGLE MATTRESS (SMALL)
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 24);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1258,9 +1279,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BOXSPRING KING"))
+                        if (key.Contains("BOXSPRING KING"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 15);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1272,9 +1293,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BOXSPRING SINGLE"))
+                        if (key.Contains("BOXSPRING SINGLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1286,9 +1307,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BOXSPRING QUEEN"))
+                        if (key.Contains("BOXSPRING QUEEN"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1300,9 +1321,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BOXSPRING DOUBLE"))
+                        if (key.Contains("BOXSPRING DOUBLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             nPlastic_bags += n_items;
                             if (n_items > 0)
@@ -1314,9 +1335,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("COMMODE"))
+                        if (key.Contains("COMMODE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1327,10 +1348,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("NIGHTSTAND"))
+                        if (key.Contains("NIGHTSTAND"))
                         {
                             //TABLE DE CHEVET 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 11);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1342,10 +1363,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("WARDROBE (2 DOORS)"))
+                        if (key.Contains("WARDROBE (2 DOORS)"))
                         {
                             //ARMOIRE(2 PORTES)  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 19);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1356,10 +1377,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("WARDROBE (1 DOOR)"))
+                        if (key.Contains("WARDROBE (1 DOOR)"))
                         {
                             //WARDROBE (1 DOOR)  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1371,9 +1392,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CRADLE"))
+                        if (key.Contains("CRADLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 7);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1384,9 +1405,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LOVESEAT (2-SEATER SOFA)"))
+                        if (key.Contains("LOVESEAT (2-SEATER SOFA)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1398,9 +1419,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.06;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SOFA (3-SEATER)"))
+                        if (key.Contains("SOFA (3-SEATER)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 16);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1411,9 +1432,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.10;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("ARMCHAIR"))
+                        if (key.Contains("ARMCHAIR"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 9);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1425,11 +1446,11 @@ namespace MovingEstimator
                             }
                         }
 
-                        if (s_Lines[n_Line].Contains("TV STAND"))
+                        if (key.Contains("TV STAND"))
                         {
-                            if (s_Lines[n_Line].Contains("LARGE"))
+                            if (key.Contains("LARGE"))
                             {
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -1440,9 +1461,9 @@ namespace MovingEstimator
                                     dUnLoading_time += n_items * 0.2;
                                 }
                             }
-                            if (s_Lines[n_Line].Contains("MEDIUM/SMALL"))
+                            if (key.Contains("MEDIUM/SMALL"))
                             {
-                                s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 24);
+                                s_Lines[n_Line] = value;
                                 n_items = int.Parse(s_Lines[n_Line]);
                                 if (n_items > 0)
                                 {
@@ -1455,9 +1476,9 @@ namespace MovingEstimator
                             }
                         }
 
-                        if (s_Lines[n_Line].Contains("TV (LARGE)"))
+                        if (key.Contains("TV (LARGE)"))
                         {// TÉLÉVISEUR(GRAND) 2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 11);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1468,9 +1489,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TV (MEDIUM/SMALL)"))
+                        if (key.Contains("TV (MEDIUM/SMALL)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 18);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1482,9 +1503,9 @@ namespace MovingEstimator
                             }
                         }
 
-                        if (s_Lines[n_Line].Contains("COFFEE AND SIDE TABLES"))
+                        if (key.Contains("COFFEE AND SIDE TABLES"))
                         {//COFFEE AND SIDE TABLES  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 23);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1495,9 +1516,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DINING OR PATIO TABLES"))
+                        if (key.Contains("DINING OR PATIO TABLES"))
                         {//DINING OR PATIO TABLES  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 23);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1509,9 +1530,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.05;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("CHAIRS"))
+                        if (key.Contains("CHAIRS"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 7);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1522,9 +1543,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LIBRARY"))
+                        if (key.Contains("LIBRARY"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 8);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1535,10 +1556,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DRAWER FOLDER CABINET"))
+                        if (key.Contains("DRAWER FOLDER CABINET"))
                         {
                             //DRAWER FOLDER CABINET 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 22);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1549,10 +1570,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("DESSERT, HUCHE, CABINETS"))
+                        if (key.Contains("DESSERT, HUCHE, CABINETS"))
                         {
                             //DESSERT, HUCHE, CABINETS  1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1563,10 +1584,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.08;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MIRRORS - FRAMES"))
+                        if (key.Contains("MIRRORS - FRAMES"))
                         {
                             //MIRRORS - FRAMES    2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1577,10 +1598,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LARGE CARPET"))
+                        if (key.Contains("LARGE CARPET"))
                         {
                             //LARGE CARPET 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 13);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1591,10 +1612,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SMALL - MEDIUM CARPET"))
+                        if (key.Contains("SMALL - MEDIUM CARPET"))
                         {
                             //LARGE CARPET 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 22);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1605,10 +1626,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("LAMPS AND LAMP SHADES"))
+                        if (key.Contains("LAMPS AND LAMP SHADES"))
                         {
                             //LAMPE 1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 22);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1620,23 +1641,23 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SAFE"))
+                        if (key.Contains("SAFE"))
                         {
-                            if (s_Lines[n_Line].Contains("Small"))
+                            if (key.Contains("Small"))
                             {
                                 s_inventory += " Small SAFE; ";
                                 dVolume += .4;
                                 dLoading_time += 0.04;
                                 dUnLoading_time += 0.03;
                             }
-                            if (s_Lines[n_Line].Contains("Average"))
+                            if (key.Contains("Average"))
                             {
                                 s_inventory += "---- MEDIUM SAFE (maximum 300 lbs, else 1 hour extra); ----";
                                 dVolume += .6;
                                 dLoading_time += 0.4;
                                 dUnLoading_time += 0.2;
                             }
-                            if (s_Lines[n_Line].Contains("Big"))
+                            if (key.Contains("Big"))
                             {
                                 s_inventory += "---- BIG SAFE (maximum 300 lbs, else 1 hour extra); ----";
                                 dVolume += 1.2;
@@ -1644,23 +1665,23 @@ namespace MovingEstimator
                                 dUnLoading_time += 0.5;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("PIANO"))
+                        if (key.Contains("PIANO"))
                         {
-                            if (s_Lines[n_Line].Contains("Small"))
+                            if (key.Contains("Small"))
                             {
                                 s_inventory += " SMALL PIANO; ";
                                 dVolume += .4;
                                 dLoading_time += 0.04;
                                 dUnLoading_time += 0.03;
                             }
-                            if (s_Lines[n_Line].Contains("Average"))
+                            if (key.Contains("Average"))
                             {
                                 s_inventory += "---- Average PIANO (maximum 300 lbs, else 1 hour extra); ----";
                                 dVolume += .6;
                                 dLoading_time += 0.4;
                                 dUnLoading_time += 0.2;
                             }
-                            if (s_Lines[n_Line].Contains("Big"))
+                            if (key.Contains("Big"))
                             {
                                 s_inventory += "---- Big PIANO ( maximum 300 lbs, else 1 hour extra); ----";
                                 dVolume += 1.2;
@@ -1668,10 +1689,10 @@ namespace MovingEstimator
                                 dUnLoading_time += .5;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BARBECUE"))
+                        if (key.Contains("BARBECUE"))
                         {
                             //BARBECUE	2
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 9);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1682,10 +1703,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.04;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("BIKE") && !s_Lines[n_Line].Contains("STATIONARY BIKES"))
+                        if (key.Contains("BIKE") && !key.Contains("STATIONARY BIKES"))
                         {
                             //VÉLO	1
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 5);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1697,9 +1718,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.02;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("SUITCASES"))
+                        if (key.Contains("SUITCASES"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 10);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1711,10 +1732,10 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TIRES"))
+                        if (key.Contains("TIRES"))
                         {
                             //PNEUS   13
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 6);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1726,9 +1747,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("TREADMILL"))
+                        if (key.Contains("TREADMILL"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 10);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1739,9 +1760,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.15;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("STATIONARY BIKES"))
+                        if (key.Contains("STATIONARY BIKES"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 17);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1752,9 +1773,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 0.1;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("POOL TABLE"))
+                        if (key.Contains("POOL TABLE"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 11);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1765,9 +1786,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * 3;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("YOUR BOXES (APPROXIMATE)"))
+                        if (key.Contains("YOUR BOXES (APPROXIMATE)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 25);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1778,9 +1799,9 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * .01;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("WARDROBE BOXES (4 PROVIDED)"))
+                        if (key.Contains("WARDROBE BOXES (4 PROVIDED)"))
                         {
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 28);
+                            s_Lines[n_Line] = value;
                             n_items = int.Parse(s_Lines[n_Line]);
                             if (n_items > 0)
                             {
@@ -1793,17 +1814,17 @@ namespace MovingEstimator
                                 dUnLoading_time += n_items * .03;
                             }
                         }
-                        if (s_Lines[n_Line].Contains("MORE DETAILS"))
+                        if (key.Contains("MORE DETAILS"))
                         {
                             //PLUS DE PRÉCISIONS rien pour l\'instant
-                            s_Lines[n_Line] = s_Lines[n_Line].Remove(0, 13);
+                            s_Lines[n_Line] = value;
                             s_notes += "\nMORE DETAILS: ";
                             s_notes += s_Lines[n_Line];
                         }
-                        if (s_Lines[n_Line].Contains("HOW DID YOU HEAR ABOUT US ?"))
+                        if (key.Contains("HOW DID YOU HEAR ABOUT US ?"))
                         {
                             s_notes += '\n' + s_Lines[n_Line];
-                            textBox_Destination_source.Text = s_Lines[n_Line].Remove(0, 28);
+                            textBox_Destination_source.Text = value;
                         }
 
                         n_Line++;
